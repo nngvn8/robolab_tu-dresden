@@ -7,8 +7,10 @@ import paho.mqtt.client as mqtt
 import uuid
 import signal
 
+import time
+
 from communication import Communication
-from odometry import Odometry
+from odometry import Robot
 from planet import Direction, Planet
 
 client = None  # DO NOT EDIT
@@ -36,7 +38,49 @@ def run():
     # THE EXECUTION OF ALL CODE SHALL BE STARTED FROM WITHIN THIS FUNCTION.
     # ADD YOUR OWN IMPLEMENTATION HEREAFTER.
 
-    print("Hello World!")
+    robot = Robot()
+    robot.turn_w_ticks()
+    # robot.forward()
+    # robot.find_edges()
+    # start_time = time.time()
+    #
+    # counter = 0
+    # laps = 1
+    # while counter < 2 * laps:
+    #     robot.rotate(100)
+    #     luminance = 200
+    #     while luminance > 80:
+    #         print(f"{luminance}")
+    #         luminance = robot.calc_luminance()
+    #         robot.rotate(100)
+    #     print(f"{luminance}")
+    #     counter += 1
+    #     time.sleep(0.2)
+    #     print(f"counter: {counter}")
+    # robot.stop()
+    # print(time.time() - start_time)
+
+    # robot.find_edges()
+    # print(f"{robot.calc_luminance()}")
+
+
+    # print(f"red: {robot.color_sensor.red}")
+    # print(f"green: {robot.color_sensor.green}")
+    # print(f"blue: {robot.color_sensor.blue}")
+
+    # try:
+    # except KeyboardInterrupt:
+    #     print(time.time() - start_time)
+
+    # while True:
+    #     if robot.found_node():
+    #         robot.scan_for_edges()
+    #         break
+    #     else:
+    #         robot.follow_line()
+    # print(f"{robot.found_node()}")
+
+    robot.right_motor.run_to_rel_pos({'position_sp': -90 * 2 - 30, 'speed_sp': robot.rotation_speed})
 
 
 # DO NOT EDIT
