@@ -103,7 +103,7 @@ class Robot:
         self.pid_controller.adjust_motors(luminance, self)
 
     def found_node(self):
-        if self.color_sensor.red * 2 > (self.color_sensor.green + self.color_sensor.blue) * 3:
+        if self.color_sensor.red * 10 > (self.color_sensor.green + self.color_sensor.blue) * 16.47:
             self.node_found = "red"
             # print("red")
             return True
@@ -118,13 +118,17 @@ class Robot:
         return 0.2126 * self.color_sensor.red + 0.7152 * self.color_sensor.green + 0.0722 * self.color_sensor.blue
 
     def scan_for_edges(self):
-        bool = self.found_node()
-        # print(f"first: {bool}")
-        while bool:
+        node_found = self.node_found
+        while self.found_node():
             self.forward()
-            # print(bool)
-            bool = self.found_node()
-        # print(f"last: {bool}")
+        if node_found == "red":
+            self.left_motor.run_to_rel_pos(position_sp=110)
+            self.right_motor.run_to_rel_pos(position_sp=70)
+            self.left_motor.wait_until_not_moving()
+        elif node_found == "blue":
+            self.left_motor.run_to_rel_pos(position_sp=110)
+            self.right_motor.run_to_rel_pos(position_sp=55)
+            self.left_motor.wait_until_not_moving()
         self.stop()
         # return self.find_edges()
 
