@@ -39,7 +39,10 @@ def run():
     # ADD YOUR OWN IMPLEMENTATION HEREAFTER.
 
     robot = Robot()
-    robot.turn_w_ticks()
+
+    # robot.turn_w_ticks(360)
+    # print(f"cur_voltage: {robot.cur_voltage()}")
+    # print(f"cur_current: {robot.cur_current()}")
     # robot.forward()
     # robot.find_edges()
     # start_time = time.time()
@@ -72,15 +75,22 @@ def run():
     # except KeyboardInterrupt:
     #     print(time.time() - start_time)
 
-    # while True:
-    #     if robot.found_node():
-    #         robot.scan_for_edges()
-    #         break
-    #     else:
-    #         robot.follow_line()
-    # print(f"{robot.found_node()}")
+    while True:
+        # print(f"robot position {robot.left_motor.position}")
+        # print(f"robot position {robot.right_motor.position}")
+        if robot.found_node():
+            robot.odometry.det_new_pos()
+            robot.scan_for_edges()
+            break
+        else:
+            robot.follow_line()
 
-    robot.right_motor.run_to_rel_pos({'position_sp': -90 * 2 - 30, 'speed_sp': robot.rotation_speed})
+    # robot.forward_w_ticks(360*14+100)
+    # robot.odometry.det_new_pos()
+
+    print(f"length of array with motor positions: {len(robot.odometry.motor_positions)}")
+
+    # print(f"{robot.found_node()}")
 
 
 # DO NOT EDIT
