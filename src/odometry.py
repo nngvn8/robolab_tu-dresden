@@ -2,6 +2,7 @@
 import ev3dev.ev3 as ev3
 import time
 from robot_controls import PidController, Odometry
+from math import floor, ceil
 
 
 
@@ -11,11 +12,8 @@ class Robot:
     ROTATION_VOL = 7565866  # 7635666
     ROTATION_CUR = 305333  # 233333
 
-
     def __init__(self, movement_speed=200, rotation_speed=700):
-        """
-        Initializes odometry module
-        """
+
         # initialize motors
         self.default_speed = movement_speed  # never slower than 25, or better 30
         self.rotation_speed = rotation_speed
@@ -32,8 +30,10 @@ class Robot:
         self.pid_controller = PidController()
         self.odometry = Odometry(self)
 
-        # variable to store a found node with its color
+        # variable to store found node with color
         self.node_found = ""
+
+        # motor position counter and time period
         self.motor_pos_ctr = 1
         self.motor_pos_ct_T = 10
 
@@ -42,20 +42,14 @@ class Robot:
     def forward(self, speed=None):
         if speed is None:
             speed = self.default_speed
-        self.left_motor.speed_sp = speed
-        self.right_motor.speed_sp = speed
-        self.left_motor.command = "run-forever"
-        self.right_motor.command = "run-forever"
+        self.left_motor.run_forever(speed_sp=speed)
+        self.right_motor.run_forever(speed_sp=speed)
 
     def forward_w_ticks(self, ticks, speed=None):
         if speed is None:
             speed = self.default_speed
-        self.left_motor.position_sp = ticks  # correcting?
-        self.right_motor.position_sp = ticks  # correcting?
-        self.left_motor.speed_sp = speed
-        self.right_motor.speed_sp = speed
-        self.left_motor.command = "run-to-rel-pos"
-        self.right_motor.command = "run-to-rel-pos"
+        self.left_motor.run_to_rel_pos(position_sp=ticks, speed_sp=speed)
+        self.right_motor.run_to_rel_pos(position_sp=ticks, speed_sp=speed)
         while self.left_motor.is_running and self.right_motor.is_running:
             self.odometry.add_motor_pos(self)
         self.stop()
@@ -63,10 +57,8 @@ class Robot:
     def rotate(self, speed=None):
         if speed is None:
             speed = self.rotation_speed
-        self.left_motor.speed_sp = -speed
-        self.right_motor.speed_sp = speed
-        self.left_motor.command = "run-forever"
-        self.right_motor.command = "run-forever"
+        self.left_motor.run_forever(speed_sp=-speed)
+        self.right_motor.run_forever(speed_sp=speed)
 
     def turn_w_time(self, degree=90):
         turning_time = self.TIME360_AT100 * degree / 360
@@ -78,12 +70,8 @@ class Robot:
     def turn_w_ticks(self, degree=90, speed=None):
         if speed is None:
             speed = self.rotation_speed
-        self.left_motor.position_sp = -degree*2  # correcting?
-        self.right_motor.position_sp = degree*2  # correcting?
-        self.left_motor.speed_sp = -speed
-        self.right_motor.speed_sp = speed
-        self.left_motor.command = "run-to-rel-pos"
-        self.right_motor.command = "run-to-rel-pos"
+        self.left_motor.run_to_rel_pos(position_sp=-degree*2, speed_sp=-speed)  # correcting?
+        self.left_motor.run_to_rel_pos(position_sp=degree*2, speed_sp=speed)  # correcting?
         while self.left_motor.is_running and self.right_motor.is_running:
             pass
         self.stop()
@@ -105,11 +93,9 @@ class Robot:
     def found_node(self):
         if self.color_sensor.red * 10 > (self.color_sensor.green + self.color_sensor.blue) * 16.47:
             self.node_found = "red"
-            # print("red")
             return True
         if 55 > self.color_sensor.red > 35 and 180 > self.color_sensor.green > 155 and 130 > self.color_sensor.blue > 110:
             self.node_found = "blue"
-            # print("blue")
             return True
         self.node_found = ""
         return False
@@ -118,9 +104,12 @@ class Robot:
         return 0.2126 * self.color_sensor.red + 0.7152 * self.color_sensor.green + 0.0722 * self.color_sensor.blue
 
     def scan_for_edges(self):
+        # drive while on node (color sensor on node)
         node_found = self.node_found
         while self.found_node():
             self.forward()
+
+        # position on the exact middle of node
         if node_found == "red":
             self.left_motor.run_to_rel_pos(position_sp=110)
             self.right_motor.run_to_rel_pos(position_sp=70)
@@ -143,7 +132,6 @@ class Robot:
                 self.rotate(100)
             time.sleep(0.2)
             edges.append('a')
-            # print(edges)
         return edges
 
     def get_cur_voltage(self):

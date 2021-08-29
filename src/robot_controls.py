@@ -1,5 +1,5 @@
 import time
-from math import sin, cos, pi
+from math import sin, cos, pi, floor, ceil
 
 
 class PidController:
@@ -7,7 +7,7 @@ class PidController:
     def __init__(self):
         # k parameters times 100
         self.kp = 75  # not greater than kc = 100 evt smaller scaling const proportional part 65
-        self.ki = 5  # to be set scaling const integral part dt = 46.897/1000 = 0.0469 Pc = 0.2
+        self.ki = 5   # to be set scaling const integral part dt = 46.897/1000 = 0.0469 Pc = 0.2
         self.kd = 50  # 32 to be set scaling const derivative part
         self.integral = 0
         self.last_error = 0
@@ -49,10 +49,10 @@ class Odometry:
     WHEEL_DISTANCE = 90  # 88 # 105 middle to middle but 105 much better  # middle to middle
     DISTANCE_PER_TICK = 2000 / 5140  # 0.41 # mm / tick    ## BEFORE: pi * 55 / 360  # pi * d / number_ticks360 in mm / tick
 
-    def __init__(self, robot):
+    def __init__(self):
         self.motor_positions = []
 
-    def det_new_pos(self, x=0, y=0, direction=0):
+    def det_new_pos(self, found_color, x=0, y=0, direction=0):
 
         direction = self.cood_to_math(direction)  # transform into math representation
         direction_rad = direction / 180 * pi      # convert into radians
@@ -72,19 +72,47 @@ class Odometry:
         print(f"distance travelled x (mm): {x}")
         print(f"distance travelled y (mm): {y}")
 
-        print(f"direction: {self.math_to_cood(direction_rad / pi * 180)}")
-        x = round(x / 500)
-        y = round(y / 500)
-
         direction = (direction_rad / pi * 180) % 360  # convert to degree
         direction = (round(direction / 90) * 90)      # direction is multiple of 90
         direction = self.math_to_cood(direction)      # transform into coordinate representation
+
+        print(f"direction: {self.math_to_cood(direction_rad / pi * 180)}")
+
+        # x = round(x / 500)
+        # y = round(y / 500)
+        x, y = self.most_likely_xy(x/500, y/500, found_color)
 
         print(f"x: {x}")
         print(f"y: {y}")
         print(f"direction (rounded): {direction}")
 
         return x, y, direction
+
+    def most_likely_xy(self, x, y, found_color):
+        x_floor = floor(x)
+        y_floor = floor(y)
+        x_ceil = ceil(x)
+        y_ceil = ceil(y)
+
+        # cases (1,red) and (0,blue)
+        # lower left node has same color has same color as found node
+        if (x_floor + y_floor) % 2 == 1 and found_color == "red" or (
+                x_floor + y_floor) % 2 == 0 and found_color == "blue":
+            # lower left or upper right closer? (pythagoras)
+            if (x - x_floor) ** 2 + (y - floor(y)) ** 2 < (x_ceil - x) ** 2 + (y_ceil - y) ** 2:
+                return x_floor, y_floor
+            else:
+                return x_ceil, y_ceil
+
+        # cases (0,red) and (1,blue)
+        # lower left node has NOT the same color has same color as found node
+        if (x_floor + y_floor) % 2 == 0 and found_color == "red" or (
+                x_floor + y_floor) % 2 == 1 and found_color == "blue":
+            # upper left or lower right closer? (pythagoras)
+            if (x - x_floor) ** 2 + (y_ceil - y) ** 2 < (x_ceil - x) ** 2 + (y - y_floor) ** 2:
+                return x_floor, y_ceil
+            else:
+                return x_ceil, y_floor
 
     def dist_wheels(self, i):
         d_lmotor = self.motor_positions[i+1][0] - self.motor_positions[i][0]  # difference in motor_position

@@ -79,8 +79,8 @@ def run():
         # print(f"robot position {robot.left_motor.position}")
         # print(f"robot position {robot.right_motor.position}")
         if robot.found_node():
-            robot.odometry.det_new_pos()
-            robot.scan_for_edges()
+            robot.odometry.det_new_pos(robot.node_found)  # robot as attribute of odometry?
+            robot.scan_for_edges()                        # should include det_new_pos?
             break
         else:
             robot.follow_line()
