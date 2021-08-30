@@ -39,6 +39,8 @@ class Communication:
         self.client.subscribe('explorer/131', qos=1)  #topic subscribtion
         self.client.loop_start()
 
+        self.planetName=""
+
 
     # DO NOT EDIT THE METHOD SIGNATURE
     def on_message(self, client, data, message):
@@ -57,6 +59,8 @@ class Communication:
         # YOUR CODE FOLLOWS (remove pass, please!)
 
         if 'planet' == payload["type"]:
+            # first communication
+            self.client.subscribe('planet/{}'.format(self.planetName), qos=1)
             print("server sent: '{}'".format(payload))
         elif 'explorer' == payload["type"]:
             print("server sent '{}'".format(payload))
@@ -74,8 +78,7 @@ class Communication:
             print("server sent '{}'".format(payload))
 
 
-        #first communication
-        self.client.subscribe('planet/{}'.format(self.planetName), qos=1)
+
 
 
 
@@ -101,12 +104,72 @@ class Communication:
 
         #send message to mothership
         #topic = channel, message = String
-        self.client.publish(topic, payload=message, qos=1)
+        self.client.publish(topic, payload=json.dumps(message), qos=1)
 
-        #path communication
-        if #Roboter an Punkt
-            self.client.publish("planet/{}/131", '{"from": "client","type": "path","payload": {"startX": <Xs>,"startY": <Ys>, "startDirection": <Ds>,"endX": <Xe>,"endY": <Ye>,"endDirection": <De>,"pathStatus": "free|blocked"}}')
+    def ready_message(self):
+        message={"from": "client","type": "ready"}
+        topic="explorer/131"
+        self.send_message(topic, message)
 
+    def path_message(self):
+        message={
+            "from": "client",
+            "type": "path",
+            "payload": {
+                "startX": "<Xs>",
+                "startY": "<Ys>",
+                "startDirection": "<Ds>",
+                "endX": "<Xe>",
+                "endY": "<Ye>",
+                "endDirection": "<De>",
+                "pathStatus": "free|blocked"
+            }
+        }
+        topic=f"planet/{self.planetName}/131"
+        self.send_message(topic, message)
+
+    def pathSelect_message(self):
+        message={
+            "from": "client",
+            "type": "pathSelect",
+            "payload": {
+                "startX":   "<Xs>",
+                "startY": "<Ys>",
+                "startDirection": "<Ds>"
+            }
+        }
+        topic = f"planet/{self.planetName}/131"
+        self.send_message(topic, message)
+
+    def targetReached_message(self):
+        message={
+            "from": "client",
+            "type": "targetReached",
+            "payload": {
+                "message": "target reached, mission completed"
+            }
+        }
+        topic = "explorer/131"
+        self.send_message(topic, message)
+
+    def explorationCompleted_message(self):
+        message={
+            "from": "client",
+            "type": "explorationCompleted",
+            "payload": {
+                "message": "exploration completed"
+            }
+        }
+        topic = "explorer/131"
+        self.send_message(topic, message)
+
+    def syntaxTester_message(self):
+        message={
+            "from": "client",
+            "type": "ready"
+        }
+        topic="comtest/131"
+        self.send_message(topic, message)
 
     # DO NOT EDIT THE METHOD SIGNATURE OR BODY
     #
