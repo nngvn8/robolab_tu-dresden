@@ -21,7 +21,7 @@ def run():
     # Your script isn't able to close the client after crashing.
     global client
 
-    client_id = 'YOURGROUPID-' + str(uuid.uuid4())  # Replace YOURGROUPID with your group ID
+    client_id = '131' + str(uuid.uuid4())  # Replace YOURGROUPID with your group ID
     client = mqtt.Client(client_id=client_id,  # Unique Client-ID to recognize our program
                          clean_session=True,  # We want a clean session after disconnect or abort/crash
                          protocol=mqtt.MQTTv311  # Define MQTT protocol version
@@ -35,6 +35,12 @@ def run():
 
     # THE EXECUTION OF ALL CODE SHALL BE STARTED FROM WITHIN THIS FUNCTION.
     # ADD YOUR OWN IMPLEMENTATION HEREAFTER.
+
+    #ready-message call
+    ready = Communication(client, logger)
+    #call method
+    #channel on server = explorer/131 (String), message = json script
+    ready.send_message("explorer/131", '{"from": "client","type": "ready"} ')
 
     print("Hello World!")
 

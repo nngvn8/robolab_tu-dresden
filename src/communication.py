@@ -4,6 +4,7 @@
 import json
 import platform
 import ssl
+#import OpenSSL
 
 # Fix: SSL certificate problem on macOS
 if all(platform.mac_ver()):
@@ -25,11 +26,19 @@ class Communication:
         """
         # DO NOT CHANGE THE SETUP HERE
         self.client = mqtt_client
-        self.client.tls_set(tls_version=ssl.PROTOCOL_TLS)
+        #self.client.tls_set(tls_version=ssl.PROTOCOL_TLS)
         self.client.on_message = self.safe_on_message_handler
-        # Add your client setup here
 
         self.logger = logger
+
+        # Add your client setup here
+
+        #self.client = mqtt.Client(client_id="131", clean_session=False, protocol=mqtt.MQTTv31) #idk
+        self.client.username_pw_set('131', password='cxdOXaj4Q5') #password from python test site
+        self.client.connect("mothership.inf.tu-dresden.de", port=1883) #connection to mothership
+        self.client.subscribe('explorer/131', qos=1)  #channel subscribtion
+        self.client.loop_start()
+
 
     # DO NOT EDIT THE METHOD SIGNATURE
     def on_message(self, client, data, message):
@@ -61,7 +70,11 @@ class Communication:
         self.logger.debug(json.dumps(message, indent=2))
 
         # YOUR CODE FOLLOWS (remove pass, please!)
-        pass
+
+        #send message to mothership
+        #topic = channel, message = String
+        self.client.publish(topic, payload=message, qos=1)
+
 
     # DO NOT EDIT THE METHOD SIGNATURE OR BODY
     #
