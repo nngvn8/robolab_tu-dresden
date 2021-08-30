@@ -39,7 +39,15 @@ class Communication:
         self.client.subscribe('explorer/131', qos=1)  #topic subscribtion
         self.client.loop_start()
 
+        #variable declarations
         self.planetName=""
+        self.startX=None
+        self.startY=None
+        self.startOrientation=None
+        self.startDirection=None
+        self.endX=None
+        self.endY=None
+        self.endDirection=None
 
 
     # DO NOT EDIT THE METHOD SIGNATURE
@@ -58,14 +66,39 @@ class Communication:
 
         # YOUR CODE FOLLOWS (remove pass, please!)
 
+       if 'server' == payload["from"]: #filter only server messages (not messages roboter send)
+
+        #receiving ready messages
         if 'planet' == payload["type"]:
-            # first communication
-            self.client.subscribe('planet/{}'.format(self.planetName), qos=1)
-            print("server sent: '{}'".format(payload))
+            self.planetName=message["payload"]["planetName"]
+            self.startX=message["payload"]["startX"]
+            self.startY=message["payload"]["startY"]
+            self.startOrientation=["payload"]["startOrientation"]
+
+            self.client.subscribe(f"planet/{self.planetName}/131", qos=1)
+            #print("server sent: '{}'".format(payload))
+
         elif 'explorer' == payload["type"]:
             print("server sent '{}'".format(payload))
+
+        #receiving path messages
         elif 'path' == payload["type"]:
-            print("server sent '{}'".format(payload))
+            self.startX=message["payload"]["startX"]
+            self.startY = message["payload"]["startY"]
+            self.startDirection = message["payload"]["startDirection"]
+            self.endX = message["payload"]["endX"]
+            self.endY = message["payload"]["endY"]
+            self.endDirection = message["payload"]["endDirection"]
+            "startX": < Xs >,
+            "startY": < Ys >,
+            "startDirection": < Ds >,
+            "endX": < Xc >,
+            "endY": < Yc >,
+            "endDirection": < Dc >,
+            "pathStatus": "free|blocked",
+            "pathWeight": < weight >
+
+            #print("server sent '{}'".format(payload))
         elif 'pathSelect' == payload["type"]:
             print("server sent '{}'".format(payload))
         elif 'pathUnveiled' == payload["type"]:
@@ -76,12 +109,6 @@ class Communication:
             print("server sent '{}'".format(payload))
         elif 'syntax' == payload["type"]:
             print("server sent '{}'".format(payload))
-
-
-
-
-
-
 
 
 
