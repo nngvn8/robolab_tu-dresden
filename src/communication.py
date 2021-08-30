@@ -33,10 +33,10 @@ class Communication:
 
         # Add your client setup here
 
-        #self.client = mqtt.Client(client_id="131", clean_session=False, protocol=mqtt.MQTTv31) #idk
+        #self.client = mqtt.Client(client_id="131", clean_session=False, protocol=mqtt.MQTTv31)
         self.client.username_pw_set('131', password='cxdOXaj4Q5') #password from python test site
         self.client.connect("mothership.inf.tu-dresden.de", port=1883) #connection to mothership
-        self.client.subscribe('explorer/131', qos=1)  #channel subscribtion
+        self.client.subscribe('explorer/131', qos=1)  #topic subscribtion
         self.client.loop_start()
 
 
@@ -52,8 +52,36 @@ class Communication:
         payload = json.loads(message.payload.decode('utf-8'))
         self.logger.debug(json.dumps(payload, indent=2))
 
+        #print(payload)
+
         # YOUR CODE FOLLOWS (remove pass, please!)
-        pass
+
+        if 'planet' == payload["type"]:
+            print("server sent: '{}'".format(payload))
+        elif 'explorer' == payload["type"]:
+            print("server sent '{}'".format(payload))
+        elif 'path' == payload["type"]:
+            print("server sent '{}'".format(payload))
+        elif 'pathSelect' == payload["type"]:
+            print("server sent '{}'".format(payload))
+        elif 'pathUnveiled' == payload["type"]:
+            print("server sent '{}'".format(payload))
+        elif 'target' == payload["type"]:
+            print("server sent '{}'".format(payload))
+        elif 'done' == payload["type"]:
+            print("server sent '{}'".format(payload))
+        elif 'syntax' == payload["type"]:
+            print("server sent '{}'".format(payload))
+
+
+        #first communication
+        self.client.subscribe('planet/{}'.format(self.planetName), qos=1)
+
+
+
+
+
+
 
     # DO NOT EDIT THE METHOD SIGNATURE
     #
@@ -74,6 +102,10 @@ class Communication:
         #send message to mothership
         #topic = channel, message = String
         self.client.publish(topic, payload=message, qos=1)
+
+        #path communication
+        if #Roboter an Punkt
+            self.client.publish("planet/{}/131", '{"from": "client","type": "path","payload": {"startX": <Xs>,"startY": <Ys>, "startDirection": <Ds>,"endX": <Xe>,"endY": <Ye>,"endDirection": <De>,"pathStatus": "free|blocked"}}')
 
 
     # DO NOT EDIT THE METHOD SIGNATURE OR BODY

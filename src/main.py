@@ -41,6 +41,13 @@ def run():
     #call method
     #channel on server = explorer/131 (String), message = json script
     ready.send_message("explorer/131", '{"from": "client","type": "ready"} ')
+    while True:
+        pass
+
+    #x="hallo"
+    #dict = {"from": "Hello"}
+    #print(f"{'l' in x}")
+
 
     print("Hello World!")
 
