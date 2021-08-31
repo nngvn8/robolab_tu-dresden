@@ -260,3 +260,121 @@
     "startOrientation": 0
   }
 }
+2021-08-31 14:12:56,035: Send to: explorer/131
+2021-08-31 14:12:56,036: {
+  "from": "client",
+  "type": "ready"
+}
+2021-08-31 14:12:56,066: {
+  "from": "client",
+  "type": "ready"
+}
+2021-08-31 14:12:56,066: {
+  "from": "server",
+  "type": "planet",
+  "payload": {
+    "planetName": "Gromit",
+    "startX": -1,
+    "startY": -2,
+    "startOrientation": 0
+  }
+}
+2021-08-31 14:14:11,098: Send to: explorer/131
+2021-08-31 14:14:11,099: {
+  "from": "client",
+  "type": "ready"
+}
+2021-08-31 14:14:11,134: {
+  "from": "client",
+  "type": "ready"
+}
+2021-08-31 14:14:11,141: {
+  "from": "server",
+  "type": "planet",
+  "payload": {
+    "planetName": "Gromit",
+    "startX": -1,
+    "startY": -2,
+    "startOrientation": 0
+  }
+}
+2021-08-31 14:14:29,473: Send to: explorer/131
+2021-08-31 14:14:29,474: {
+  "from": "client",
+  "type": "ready"
+}
+2021-08-31 14:14:29,526: {
+  "from": "client",
+  "type": "ready"
+}
+2021-08-31 14:14:29,531: {
+  "from": "server",
+  "type": "planet",
+  "payload": {
+    "planetName": "Gromit",
+    "startX": -1,
+    "startY": -2,
+    "startOrientation": 0
+  }
+}
+2021-08-31 14:55:40,525: Send to: explorer/131
+2021-08-31 14:55:40,526: {
+  "from": "client",
+  "type": "ready"
+}
+2021-08-31 14:55:40,576: {
+  "from": "server",
+  "type": "planet",
+  "payload": {
+    "planetName": "Gromit",
+    "startX": -1,
+    "startY": -2,
+    "startOrientation": 0
+  }
+}
+2021-08-31 15:13:14,527: Send to: explorer/131
+2021-08-31 15:13:14,528: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-08-31 15:13:14,561: {
+  "from": "client",
+  "type": "ready"
+}
+2021-08-31 15:13:14,579: {
+  "from": "server",
+  "type": "planet",
+  "payload": {
+    "planetName": "Gromit",
+    "startX": -1,
+    "startY": -2,
+    "startOrientation": 0
+  }
+}
+2021-08-31 15:14:09,689: Send to: explorer/131
+2021-08-31 15:14:09,689: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-08-31 15:14:20,699: Send to: explorer/131
+2021-08-31 15:14:20,699: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-08-31 15:20:58,687: Send to: explorer/131
+2021-08-31 15:20:58,689: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-08-31 15:24:14,614: Send to: explorer/131
+2021-08-31 15:24:14,614: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-08-31 15:25:25,194: Send to: explorer/131
+2021-08-31 15:25:25,194: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-08-31 15:25:30,999: Send to: explorer/131
+2021-08-31 15:25:30,999: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-08-31 15:26:25,572: Send to: explorer/131
+2021-08-31 15:26:25,572: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-08-31 15:26:56,165: Send to: explorer/131
+2021-08-31 15:26:56,165: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-08-31 15:27:33,681: Send to: explorer/131
+2021-08-31 15:27:33,681: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-08-31 15:28:35,744: Send to: explorer/131
+2021-08-31 15:28:35,759: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-08-31 15:29:04,128: Send to: explorer/131
+2021-08-31 15:29:04,129: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-08-31 15:35:01,382: Send to: explorer/131
+2021-08-31 15:35:01,383: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-08-31 15:35:01,383: Send to: planet//131
+2021-08-31 15:35:01,383: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": 19, \"startY\": 1, \"startDirection\": 2, \"endX\": 3, \"endY\": 20, \"endDirection\": 2, \"pathStatus\": \"free|blocked\"}}"
+2021-08-31 15:35:15,436: Send to: explorer/131
+2021-08-31 15:35:15,437: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-08-31 15:35:15,437: Send to: planet//131
+2021-08-31 15:35:15,437: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": 19, \"startY\": 1, \"startDirection\": 2, \"endX\": 3, \"endY\": 20, \"endDirection\": 2, \"pathStatus\": \"free|blocked\"}}"

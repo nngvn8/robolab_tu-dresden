@@ -40,9 +40,14 @@ def run():
     ready = Communication(client, logger)
     #call method
     #channel on server = explorer/131 (String), message = json script
-    ready.send_message("explorer/131", '{"from": "client","type": "ready"} ')
-    while True:
-        pass
+    #ready.send_message("explorer/131", '{"from": "client","type": "ready"} ')
+    #ready.ready_message()
+    #ready.path_message(19, 1, 2, 3, 20, 2)
+
+
+
+   # while True:
+    #    pass
 
     #x="hallo"
     #dict = {"from": "Hello"}
