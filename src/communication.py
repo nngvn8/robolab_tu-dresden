@@ -53,7 +53,7 @@ class Communication:
         self.planetName = ""
         self.startX = None
         self.startY = None
-        self.startOrientation = 0
+        self.startOrientation = None
         self.startDirection = None
         self.endX = None
         self.endY = None
@@ -91,7 +91,7 @@ class Communication:
                 self.planetName = message["payload"]["planetName"]
                 self.startX = message["payload"]["startX"]
                 self.startY = message["payload"]["startY"]
-                self.startOrientation = ["payload"][self.startOrientation]
+                self.startOrientation = message["payload"]["startOrientation"]
 
                 # subscription planet topic
                 self.client.subscribe(f"planet/{self.planetName}/131", qos=1)  # adds planet name
@@ -122,7 +122,7 @@ class Communication:
 
             # receiving answer to path select messages
             elif 'pathSelect' == payload["type"]:
-                self.startDirection["payload"]["startDirection"]
+                self.startDirection = message["payload"]["startDirection"]
 
                 # print("server sent '{}'".format(payload))
 
@@ -215,10 +215,7 @@ class Communication:
                     "pathStatus": "blocked"
                 }
             }
-            topic = f"planet/{self.planetName}/131"  # adds planet name given from server
-            self.send_message(topic, json.dumps(message))
-
-        if Xs != Xe and Ys != Ye:
+        else:
             message = {
                 "from": "client",
                 "type": "path",
@@ -232,8 +229,9 @@ class Communication:
                     "pathStatus": "free"
                 }
             }
-            topic = f"planet/{self.planetName}/131"  # adds planet name given from server
-            self.send_message(topic, json.dumps(message))
+
+        topic = f"planet/{self.planetName}/131"  # adds planet name given from server
+        self.send_message(topic, json.dumps(message))
 
     def pathSelect_message(self, Xs, Ys, Ds):  # Variablen übergeben lassen
         message = {
@@ -247,6 +245,9 @@ class Communication:
         }
         topic = f"planet/{self.planetName}/131"
         self.send_message(topic, json.dumps(message))
+
+    def pathUnveiled_message(self):
+        pass
 
     def targetReached_message(self):
         message = {
@@ -265,6 +266,18 @@ class Communication:
             "type": "explorationCompleted",
             "payload": {
                 "message": "exploration completed"
+            }
+        }
+        topic = "explorer/131"
+        self.send_message(topic, json.dumps(message))
+
+    def testplanet_message(self):
+        self.planetName = input()
+        message = {
+            "from": "client",
+            "type": "testplanet",
+            "payload": {
+                "planetName": f"{self.planetName}"
             }
         }
         topic = "explorer/131"

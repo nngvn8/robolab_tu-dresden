@@ -41,8 +41,10 @@ def run():
     #call method
     #channel on server = explorer/131 (String), message = json script
     #ready.send_message("explorer/131", '{"from": "client","type": "ready"} ')
-    #ready.ready_message()
-    #ready.path_message(19, 1, 2, 3, 20, 2)
+    ready.testplanet_message()
+    ready.ready_message()
+    #ready.pathSelect_message(-1, -2, 0)
+    ready.path_message(-1, -2, 0, -1, -1, 0)
 
 
 
