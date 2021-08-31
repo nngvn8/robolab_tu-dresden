@@ -40,65 +40,32 @@ def run():
 
     robot = Robot()
 
-    # robot.turn_w_ticks(360)
-    # print(f"cur_voltage: {robot.cur_voltage()}")
-    # print(f"cur_current: {robot.cur_current()}")
-    # robot.forward()
-    # robot.find_edges()
-    # start_time = time.time()
-    #
-    # counter = 0
-    # laps = 1
-    # while counter < 2 * laps:
-    #     robot.rotate(100)
-    #     luminance = 200
-    #     while luminance > 80:
-    #         print(f"{luminance}")
-    #         luminance = robot.calc_luminance()
-    #         robot.rotate(100)
-    #     print(f"{luminance}")
-    #     counter += 1
-    #     time.sleep(0.2)
-    #     print(f"counter: {counter}")
-    # robot.stop()
-    # print(time.time() - start_time)
-
-    # robot.find_edges()
-    # print(f"{robot.calc_luminance()}")
-
-
-
-    # try:
-    # except KeyboardInterrupt:
-    #     print(time.time() - start_time)
+    # 10 laps
+    robot.left_motor.reset()
+    robot.right_motor.reset()
+    while True:
+        try:
+            robot.rotate()
+        except KeyboardInterrupt:
+            print(f"left_motor position: {robot.left_motor.position}")
+            print(f"right_motor position: {robot.right_motor.position}")
+            break
 
     while True:
-        # print(f"robot position {robot.left_motor.position}")
-        # print(f"robot position {robot.right_motor.position}")
         if robot.found_node():
-            robot.odometry.det_new_pos()  # robot as attribute of odometry?
-            print(f"edges: {robot.scan_for_edges()}")     # should include det_new_pos?
-            break
+            robot.enter_node()
+            robot.odometry.det_new_pos()
+            robot.stop()
+            print(f"edges: {robot.scan_for_edges()}")  # only if node not already known!
+            # break
+        elif robot.found_obstacle():
+            robot.turn(180)
+            pass
         else:
             robot.follow_line()
 
-    # speed = 100
-    # turn = 720*0.8
-    # robot.left_motor.run_to_rel_pos(position_sp=turn, speed_sp=speed)  # correcting?
-    # robot.right_motor.run_to_rel_pos(position_sp=-turn, speed_sp=-speed)  # correcting?
-    # robot.left_motor.wait_until_not_moving()
-    # print(robot.calc_luminance())
-    # robot.left_motor.run_direct(duty_cycle_sp=40)
-    # robot.right_motor.run_direct(duty_cycle_sp=-40)
-
-
-
-    # robot.forward_w_ticks(360*14+100)
-    # robot.odometry.det_new_pos()
 
     print(f"length of array with motor positions: {len(robot.odometry.motor_positions)}")
-
-    # print(f"{robot.found_node()}")
 
 
 # DO NOT EDIT
