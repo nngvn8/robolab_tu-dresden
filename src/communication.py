@@ -48,6 +48,12 @@ class Communication:
         self.endX=None
         self.endY=None
         self.endDirection=None
+        self.pathStatus=None
+        self.pathWeight=None
+        self.targetX=None
+        self.targetY=None
+        self.msg=None
+        self.errors=None
 
 
     # DO NOT EDIT THE METHOD SIGNATURE
@@ -89,26 +95,54 @@ class Communication:
             self.endX = message["payload"]["endX"]
             self.endY = message["payload"]["endY"]
             self.endDirection = message["payload"]["endDirection"]
-            "startX": < Xs >,
-            "startY": < Ys >,
-            "startDirection": < Ds >,
-            "endX": < Xc >,
-            "endY": < Yc >,
-            "endDirection": < Dc >,
-            "pathStatus": "free|blocked",
-            "pathWeight": < weight >
+            self.pathStatus=message["payload"]["pathStatus"]
+            self.pathWeight=message["payload"]["pathWeight"]
 
             #print("server sent '{}'".format(payload))
+
+        #receiving path select messages
         elif 'pathSelect' == payload["type"]:
-            print("server sent '{}'".format(payload))
+            self.startDirection["payload"]["startDirection"]
+            #print("server sent '{}'".format(payload))
+
+        #receiving path unveiled messages
         elif 'pathUnveiled' == payload["type"]:
-            print("server sent '{}'".format(payload))
+            self.startX = message["payload"]["startX"]
+            self.startY = message["payload"]["startY"]
+            self.startDirection = message["payload"]["startDirection"]
+            self.endX = message["payload"]["endX"]
+            self.endY = message["payload"]["endY"]
+            self.endDirection = message["payload"]["endDirection"]
+            self.pathStatus = message["payload"]["pathStatus"]
+            self.pathWeight = message["payload"]["pathWeight"]
+
+            #print("server sent '{}'".format(payload))
+
+        #receiving target messages
         elif 'target' == payload["type"]:
-            print("server sent '{}'".format(payload))
+            self.targetX=message["payload"]["targetX"]
+            self.targetY=message["payload"]["targetY"]
+
+            #print("server sent '{}'".format(payload))
+
+        #receiving exploration completed/target reached messages
         elif 'done' == payload["type"]:
-            print("server sent '{}'".format(payload))
+            self.msg=message["payload"]["message"]
+
+            #print("server sent '{}'".format(payload))
+
+        #receivng valid syntax messages
         elif 'syntax' == payload["type"]:
-            print("server sent '{}'".format(payload))
+            self.msg=message["payload"]["message"]
+
+            #print("server sent '{}'".format(payload))
+
+        # receivng invalid syntax messages
+        elif 'syntax' == payload["type"]:
+            self.msg = message["payload"]["message"]
+            self.errors = message["payload"]["errors"]
+
+            # print("server sent '{}'".format(payload))
 
 
 
