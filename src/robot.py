@@ -2,8 +2,6 @@
 import ev3dev.ev3 as ev3
 import time
 from robot_controls import PidController, Odometry
-from math import floor, ceil
-
 
 
 class Robot:
@@ -12,7 +10,7 @@ class Robot:
     ROTATION_VOL = 7565866  # 7635666
     ROTATION_CUR = 305333  # 233333
 
-    def __init__(self, movement_speed=200, rotation_speed=700):
+    def __init__(self, movement_speed=200, rotation_speed=200):
 
         # initialize motors
         self.default_speed = movement_speed  # never slower than 25, or better 30
@@ -37,6 +35,11 @@ class Robot:
         self.motor_pos_ctr = 1
         self.motor_pos_ct_T = 10
 
+        #
+        self.direction = 0
+        self.x_coord = 0
+        self.y_coord = 0
+
         self.TIME360_AT100 = 5.7
 
     def forward(self, speed=None):
@@ -57,8 +60,8 @@ class Robot:
     def rotate(self, speed=None):
         if speed is None:
             speed = self.rotation_speed
-        self.left_motor.run_forever(speed_sp=-speed)
-        self.right_motor.run_forever(speed_sp=speed)
+        self.left_motor.run_forever(speed_sp=speed)
+        self.right_motor.run_forever(speed_sp=-speed)
 
     def turn_w_time(self, degree=90):
         turning_time = self.TIME360_AT100 * degree / 360
@@ -68,13 +71,20 @@ class Robot:
         self.stop()
 
     def turn_w_ticks(self, degree=90, speed=None):
+        self.left_motor.reset()
+        self.right_motor.reset()
+        turn = round(degree*2*0.95)
         if speed is None:
             speed = self.rotation_speed
-        self.left_motor.run_to_rel_pos(position_sp=-degree*2, speed_sp=-speed)  # correcting?
-        self.left_motor.run_to_rel_pos(position_sp=degree*2, speed_sp=speed)  # correcting?
+        self.left_motor.run_to_rel_pos(position_sp=turn, speed_sp=speed)  # correcting?
+        self.right_motor.run_to_rel_pos(position_sp=-turn, speed_sp=-speed)  # correcting?
         while self.left_motor.is_running and self.right_motor.is_running:
             pass
-        self.stop()
+        # self.left_motor.stop(stop_action='hold')
+        # self.right_motor.stop(stop_action='hold')
+        # for find edges
+        self.left_motor.stop(stop_action='coast')
+        self.right_motor.stop(stop_action='coast')
 
     def stop(self):
         self.left_motor.stop()
@@ -91,6 +101,7 @@ class Robot:
         self.pid_controller.adjust_motors(luminance, self)
 
     def found_node(self):
+        # if 180 > self.color_sensor.red > 140 and 80 > self.color_sensor.green > 40 and 45 > self.color_sensor.blue > 5:
         if self.color_sensor.red * 10 > (self.color_sensor.green + self.color_sensor.blue) * 16.47:
             self.node_found = "red"
             return True
@@ -106,33 +117,80 @@ class Robot:
     def scan_for_edges(self):
         # drive while on node (color sensor on node)
         node_found = self.node_found
-        while self.found_node():
-            self.forward()
+        # while self.calc_luminance() < 300:
+        #     self.left_motor.run_forever(speed_sp=100)
+        #     self.right_motor.run_forever(speed_sp=120)
 
+        while self.found_node():
+            self.forward(100)
         # position on the exact middle of node
         if node_found == "red":
-            self.left_motor.run_to_rel_pos(position_sp=110)
-            self.right_motor.run_to_rel_pos(position_sp=70)
+            self.left_motor.run_to_rel_pos(position_sp=70)
+            self.right_motor.run_to_rel_pos(position_sp=50)
             self.left_motor.wait_until_not_moving()
         elif node_found == "blue":
             self.left_motor.run_to_rel_pos(position_sp=110)
             self.right_motor.run_to_rel_pos(position_sp=55)
             self.left_motor.wait_until_not_moving()
         self.stop()
-        # return self.find_edges()
+        return self.find_edges_black()
 
-    def find_edges(self):
+    def find_edges_black(self):
         edges = []
-        start_time = time.time()
-        while time.time() - start_time < self.TIME360_AT100:
-            self.rotate(100)
-            luminance = 100
-            while luminance > 90:
-                luminance = self.calc_luminance()
-                self.rotate(100)
-            time.sleep(0.2)
-            edges.append('a')
+        turn = 720  # turn 360
+        breakout = False
+        self.left_motor.reset()
+        self.right_motor.reset()
+        while self.left_motor.position < turn:
+            # get away from black line
+            self.left_motor.run_to_rel_pos(position_sp=40, speed_sp=100)
+            self.right_motor.run_to_rel_pos(position_sp=-40, speed_sp=-100)
+            self.left_motor.wait_until_not_moving()
+
+            # rotate while no line
+            while self.calc_luminance() > 55:
+                # rotate
+                self.left_motor.run_forever(speed_sp=100)
+                self.right_motor.run_forever(speed_sp=-100)
+                # stop rotation if original line found
+                if self.left_motor.position > 550 and self.calc_luminance() < 170:
+                    self.left_motor.stop(stop_action='hold')
+                    self.right_motor.stop(stop_action='hold')
+                    breakout = True
+                    break
+
+            # black found
+            print(self.left_motor.position * 1.3 / 2)
+            current_rotation = round(self.left_motor.position * 1.3 / 2 / 90) * 90
+            edges.append((self.direction + current_rotation) % 360)
+            # exit if original line found
+            if breakout:
+                break
         return edges
+
+
+    def find_edges_45(self):
+        pass
+
+    def find_edges_old(self):
+        edges = []
+        m_pos_ctr = 1
+        self.left_motor.reset()
+        self.right_motor.reset()
+        turn = 360*2*0.90
+        while self.left_motor.position < turn and self.right_motor.position > -turn:
+            self.rotate()
+            luminance = self.calc_luminance()
+            print(luminance)
+            if luminance < 70 and m_pos_ctr == 2:
+                edges.append('a')
+                m_pos_ctr = 1
+            else:
+                m_pos_ctr += 1
+        self.left_motor.stop(stop_action='hold')
+        self.right_motor.stop(stop_action='hold')
+        return edges
+
 
     def get_cur_voltage(self):
         voltage_file = open('/sys/class/power_supply/lego-ev3-battery/voltage_now')

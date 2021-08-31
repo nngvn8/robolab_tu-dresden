@@ -10,7 +10,7 @@ import signal
 import time
 
 from communication import Communication
-from odometry import Robot
+from robot import Robot
 from planet import Direction, Planet
 
 client = None  # DO NOT EDIT
@@ -67,9 +67,6 @@ def run():
     # print(f"{robot.calc_luminance()}")
 
 
-    # print(f"red: {robot.color_sensor.red}")
-    # print(f"green: {robot.color_sensor.green}")
-    # print(f"blue: {robot.color_sensor.blue}")
 
     # try:
     # except KeyboardInterrupt:
@@ -79,11 +76,22 @@ def run():
         # print(f"robot position {robot.left_motor.position}")
         # print(f"robot position {robot.right_motor.position}")
         if robot.found_node():
-            robot.odometry.det_new_pos(robot.node_found)  # robot as attribute of odometry?
-            robot.scan_for_edges()                        # should include det_new_pos?
+            robot.odometry.det_new_pos()  # robot as attribute of odometry?
+            print(f"edges: {robot.scan_for_edges()}")     # should include det_new_pos?
             break
         else:
             robot.follow_line()
+
+    # speed = 100
+    # turn = 720*0.8
+    # robot.left_motor.run_to_rel_pos(position_sp=turn, speed_sp=speed)  # correcting?
+    # robot.right_motor.run_to_rel_pos(position_sp=-turn, speed_sp=-speed)  # correcting?
+    # robot.left_motor.wait_until_not_moving()
+    # print(robot.calc_luminance())
+    # robot.left_motor.run_direct(duty_cycle_sp=40)
+    # robot.right_motor.run_direct(duty_cycle_sp=-40)
+
+
 
     # robot.forward_w_ticks(360*14+100)
     # robot.odometry.det_new_pos()

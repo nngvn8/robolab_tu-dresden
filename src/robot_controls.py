@@ -49,10 +49,11 @@ class Odometry:
     WHEEL_DISTANCE = 90  # 88 # 105 middle to middle but 105 much better  # middle to middle
     DISTANCE_PER_TICK = 2000 / 5140  # 0.41 # mm / tick    ## BEFORE: pi * 55 / 360  # pi * d / number_ticks360 in mm / tick
 
-    def __init__(self):
+    def __init__(self, robot):
         self.motor_positions = []
+        self.robot = robot
 
-    def det_new_pos(self, found_color, x=0, y=0, direction=0):
+    def det_new_pos(self, x=0, y=0, direction=0):
 
         direction = self.cood_to_math(direction)  # transform into math representation
         direction_rad = direction / 180 * pi      # convert into radians
@@ -78,15 +79,17 @@ class Odometry:
 
         print(f"direction: {self.math_to_cood(direction_rad / pi * 180)}")
 
-        # x = round(x / 500)
-        # y = round(y / 500)
-        x, y = self.most_likely_xy(x/500, y/500, found_color)
+        x = round(x / 500)
+        y = round(y / 500)
+        # x, y = self.most_likely_xy(x/500, y/500, self.robot.found_color)
 
         print(f"x: {x}")
         print(f"y: {y}")
         print(f"direction (rounded): {direction}")
 
-        return x, y, direction
+        self.robot.x_coord = x
+        self.robot.y_coord = y
+        self.robot.direction = direction
 
     def most_likely_xy(self, x, y, found_color):
         x_floor = floor(x)
