@@ -40,39 +40,49 @@ def run():
 
     robot = Robot()
 
-    # # 10 laps
-    # robot.left_motor.reset()
-    # robot.right_motor.reset()
-    # while True:
-    #     try:
-    #         robot.rotate()
-    #     except KeyboardInterrupt:
-    #         print(f"left_motor position: {robot.left_motor.position}")
-    #         print(f"right_motor position: {robot.right_motor.position}")
-    #         robot.left_motor.stop(stop_action='hold')
-    #         robot.right_motor.stop(stop_action='hold')
-    #         break
+    start_time = time.time()
 
+    # go to first Node
     # while True:
     #     robot.follow_line()
-    #     if robot.found_obstacle():
-    #         robot.turn_around()
-    robot.turn_to_direction(180)
-    # while True:
     #     if robot.found_node():
-    #         robot.enter_node()
-    #         robot.odometry.det_new_pos()
     #         robot.stop()
-    #         print(f"edges: {robot.scan_for_edges()}")  # only if node not already known!
-    #         # break
-    #     elif robot.found_obstacle():
-    #         # robot.turn(180)
-    #         pass
-    #     else:
-    #         robot.follow_line()
+    #         robot.enter_node()
+    #         robot.stop()
+    #         COMMUNICATION TELLS US THE NODE WE ARE ON
+    #         robot.odometry.set_even_odd_nodes(node_x, node_y)
+    #         break
+    #
+
+    # work on Planet
+    while True:
+        if robot.found_node():
+            robot.stop()
+            robot.enter_node()
+            robot.stop()
+            if not robot.on_ret_from_obst:
+                robot.odometry.det_new_pos(robot)
+            else:
+                robot.on_ret_from_obst = False
+                robot.x_coord = robot.last_node[0]
+                robot.y_coord = robot.last_node[1]
+                robot.direction = (robot.last_node[2] + 180) % 360
+            print(f"edges: {robot.scan_for_edges()}")  # only if node not already known!
+            # break
+        elif robot.found_obstacle():
+            robot.play_sound()
+            robot.on_ret_from_obst = True
+            robot.turn_around()
+        else:
+            robot.follow_line()
 
 
-    print(f"length of array with motor positions: {len(robot.odometry.motor_positions)}")
+
+
+    print(time.time() - start_time)
+
+
+
 
 
 # DO NOT EDIT

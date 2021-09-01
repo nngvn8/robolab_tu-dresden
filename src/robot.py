@@ -10,7 +10,7 @@ class Robot:
     TICKS360 = 620
     LUM_STOP_LINE = 200
 
-    def __init__(self, movement_speed=200, rotation_speed=100):
+    def __init__(self, movement_speed=170, rotation_speed=100):
 
         # initialize motors
         self.default_speed = movement_speed  # never slower than 25, or better 30
@@ -28,19 +28,22 @@ class Robot:
 
         # initialize pid controller
         self.pid_controller = PIDController()
-        self.odometry = Odometry(self)
+        self.odometry = Odometry()
 
         # variable to store found node with color
         self.node_found = ""
+        self.on_ret_from_obst = False
 
         # motor position counter and time period
         self.motor_pos_ctr = 1
         self.motor_pos_ct_T = 10
 
         # odometry information
-        self.direction = 270
-        self.x_coord = 0
+        self.direction = 0
+        self.x_coord = 1
         self.y_coord = 0
+
+        self.last_node = (0, 0, 0)
 
         self.TIME360_AT100 = 5.7
 
@@ -88,6 +91,9 @@ class Robot:
             self.left_motor.run_forever(speed_sp=self.rotation_speed)
             self.right_motor.run_forever(speed_sp=-self.rotation_speed)
 
+        self.direction = (self.direction + turn_deg) % 360
+        self.last_node = (self.x_coord, self.y_coord, self.direction)
+
     def turn_around(self):
         self.direction = (self.direction + 180) % 360
         self.turn_w_ticks(180, -30)
@@ -100,22 +106,18 @@ class Robot:
     def turn_w_ticks(self, degree=90, offset=0, speed=None):
         # turn = round(degree*2*0.95)
         turn = round(self.TICKS360 / 360 * degree) + offset
-        print(f"turn: {turn}")
 
         if speed is None:
             speed = self.rotation_speed
         if degree < 0:
             speed = -speed
-        print(f"speed: {speed}")
 
         self.left_motor.reset()
         self.right_motor.reset()
-        print(f"left_motor_pos: {self.left_motor.position}")
 
         while abs(self.left_motor.position) < abs(turn):
             self.left_motor.run_forever(speed_sp=speed)
             self.right_motor.run_forever(speed_sp=-speed)
-
 
     def stop(self):
         self.left_motor.stop()
@@ -127,7 +129,7 @@ class Robot:
         # add every tenth motor position
         if self.motor_pos_ctr == 10:
             self.odometry.add_motor_pos(self)
-            print(f"{self.odometry.motor_positions[-1]}")
+            # print(f"{self.odometry.motor_positions[-1]}")
             self.motor_pos_ctr = 1
         else:
             self.motor_pos_ctr += 1
@@ -140,13 +142,12 @@ class Robot:
         return False
 
     def found_node(self):
-        # if 180 > self.color_sensor.red > 140 and 80 > self.color_sensor.green > 40 and 45 > self.color_sensor.blue > 5:
 
-        if self.color_sensor.red * 10 > (self.color_sensor.green + self.color_sensor.blue) * 16.47:
+        if self.color_sensor.red in range(90, 170) and self.color_sensor.green in range(0, 100) and self.color_sensor.blue in range(0, 75):
             self.node_found = "red"
             return True
 
-        if 55 > self.color_sensor.red > 30 and 180 > self.color_sensor.green > 140 and 130 > self.color_sensor.blue > 100:
+        if self.color_sensor.red in range(0, 40) and self.color_sensor.green in range(50, 150) and self.color_sensor.blue in range(50, 120):
             self.node_found = "blue"
             return True
 
@@ -156,15 +157,21 @@ class Robot:
     def calc_luminance(self):
         return 0.2126 * self.color_sensor.red + 0.7152 * self.color_sensor.green + 0.0722 * self.color_sensor.blue
 
+    def play_sound(self):
+        ev3.Sound.tone([(200, 100, 100), (500, 200)])
+        # ev3.Sound.speak('Obstacle found!')
+
     def enter_node(self):
         # position on the exact middle of node
         if self.node_found == "red":
-            self.left_motor.run_to_rel_pos(position_sp=115)
-            self.right_motor.run_to_rel_pos(position_sp=115)
+            self.left_motor.run_to_rel_pos(position_sp=135, speed_sp=100)
+            self.right_motor.run_to_rel_pos(position_sp=135, speed_sp=100)
+            self.left_motor.wait_until_not_moving()
             self.right_motor.wait_until_not_moving()
         elif self.node_found == "blue":
-            self.left_motor.run_to_rel_pos(position_sp=115)
-            self.right_motor.run_to_rel_pos(position_sp=115)
+            self.left_motor.run_to_rel_pos(position_sp=135, speed_sp=100)
+            self.right_motor.run_to_rel_pos(position_sp=135, speed_sp=100)
+            self.left_motor.wait_until_not_moving()
             self.right_motor.wait_until_not_moving()
         self.stop()
 
@@ -198,7 +205,7 @@ class Robot:
             if breakout:
                 break
 
-            # remove stutter?
+            # remove stutter? -> other implementation needed
 
             # store found edge
             print(self.left_motor.position * 1.3 / 2)
@@ -210,5 +217,28 @@ class Robot:
             self.right_motor.run_to_rel_pos(position_sp=-40, speed_sp=-self.rotation_speed)
             self.right_motor.wait_until_not_moving()
 
-        print(f"Motor Position: {self.left_motor.position}")
+        return edges
+
+    def scan_for_edges2(self):
+        edges = []
+        line_found = False
+        turn = self.TICKS360 * 0.95
+
+        self.left_motor.reset()
+        self.right_motor.reset()
+
+        while self.left_motor.position < turn:
+            self.left_motor.run_forever(speed_sp=self.rotation_speed)
+            self.right_motor.run_forever(speed_sp=-self.rotation_speed)
+
+            if self.calc_luminance() < 55 and not line_found:
+                edges.append(self.left_motor.position)
+                line_found = True
+
+            if self.calc_luminance() > 200:
+                line_found = False
+
+        for i in range(len(edges)):
+            edges[i] = (self.direction + (round(edges[i] * 1.3 / 2 / 90) * 90)) % 360
+
         return edges

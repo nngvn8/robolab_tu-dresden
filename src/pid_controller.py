@@ -1,10 +1,13 @@
 class PIDController:
 
+    # time per Iteration: 0.12555, 0.12779 0.12345
+    # oscilation period: 12.345/14 = 0.88  13.674/15 = 0.91 -> 0.895
+
     def __init__(self):
         # k parameters times 100
-        self.kp = 40  # not greater than kc = 100 evt smaller scaling const proportional part 65
-        self.ki = 0   # to be set scaling const integral part dt = 46.897/1000 = 0.0469 Pc = 0.2
-        self.kd = 0   # 32 to be set scaling const derivative part
+        self.kp = 35  # kc = 60
+        self.ki = 1
+        self.kd = 45  # 42.76
         self.integral = 0
         self.last_error = 0
         self.offset = 170  # determined by experiment on line
