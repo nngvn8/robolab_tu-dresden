@@ -43,8 +43,10 @@ def run():
     #ready.send_message("explorer/131", '{"from": "client","type": "ready"} ')
     ready.testplanet_message()
     #ready.ready_message()
-    ready.path_message(-2, -2, 180, -2, -2, 0)
-    #ready.pathSelect_message(-2, -2, 270)
+    #ready.pathSelect_message(-2, -2, 180)
+    #ready.path_message(-2, -2, 180, -2, -2, 180)
+    ready.pathSelect_message(-2, -2, 180)
+
 
 
 

@@ -4,6 +4,7 @@
 import json
 import platform
 import ssl
+import time
 #import OpenSSL
 
 # Fix: SSL certificate problem on macOS
@@ -55,6 +56,7 @@ class Communication:
         self.startY = None
         self.startOrientation = None
         self.startDirection = None
+        self.startDirectionC = None
         self.endX = None
         self.endY = None
         self.endDirection = None
@@ -67,7 +69,7 @@ class Communication:
 
 
     # DO NOT EDIT THE METHOD SIGNATURE
-    def on_message(self, client, data, message):
+    def on_message(self, client, data, message):   # for receiving messages from mothership
         """
         Handles the callback if any message arrived
         :param client: paho.mqtt.client.Client
@@ -77,8 +79,6 @@ class Communication:
         """
         payload = json.loads(message.payload.decode('utf-8'))
         self.logger.debug(json.dumps(payload, indent=2))
-
-        # print(payload)
 
         # YOUR CODE FOLLOWS (remove pass, please!)
 
@@ -93,19 +93,14 @@ class Communication:
                 self.startY = message["payload"]["startY"]
                 self.startOrientation = message["payload"]["startOrientation"]
 
-                # subscription planet topic
+                # subscription to planet topic
                 self.client.subscribe(f"planet/{self.planetName}/131", qos=1)  # adds planet name
-
-                #print(f"server sent: {payload}")
-
 
             # receiving answer to testplanet messages
             elif 'notice' == payload["type"]:
                 self.msg = message["payload"]["message"]
 
-                # print("server sent '{}'".format(payload))
-
-            # receiving answer to path messages
+            # receiving answer to path messages with corrected coordinates and path weight
             elif 'path' == payload["type"]:
                 self.startX = message["payload"]["startX"]
                 self.startY = message["payload"]["startY"]
@@ -116,17 +111,14 @@ class Communication:
                 self.pathStatus = message["payload"]["pathStatus"]
                 self.pathWeight = message["payload"]["pathWeight"]
 
-                # add path von Tom
+                # add path von Tom um pfade in Karte aufzunehmen
 
-                # print("server sent '{}'".format(payload))
-
-            # receiving answer to path select messages
+            # receiving answer to path select messages if robot is supposed to go somewhere else than selected
             elif 'pathSelect' == payload["type"]:
-                self.startDirection = message["payload"]["startDirection"]
+                if 'blocked' == payload["payload"]["pathStatus"]:
+                    self.startDirectionC = message["payload"]["startDirection"]
 
-                # print("server sent '{}'".format(payload))
-
-            # receiving path unveiled messages
+            # receiving path unveiled messages if known path was free but is now blocked
             elif 'pathUnveiled' == payload["type"]:
                 self.startX = message["payload"]["startX"]
                 self.startY = message["payload"]["startY"]
@@ -137,14 +129,12 @@ class Communication:
                 self.pathStatus = message["payload"]["pathStatus"]
                 self.pathWeight = message["payload"]["pathWeight"]
 
-                # print("server sent '{}'".format(payload))
+                #in karte aufnehmen
 
-            # receiving answer to target messages
+            # receiving target messages if robot needs to go to target shortest path possible
             elif 'target' == payload["type"]:
                 self.targetX = message["payload"]["targetX"]
                 self.targetY = message["payload"]["targetY"]
-
-                # print("server sent '{}'".format(payload))
 
             # receiving answer to exploration completed/target reached messages
             elif 'done' == payload["type"]:
@@ -153,9 +143,8 @@ class Communication:
                 self.client.loop_stop()
                 self.client.disconnect()
 
-                #self.msg = message["payload"]["message"]
-
-                # print("server sent '{}'".format(payload))
+        # robot waits 3s before continuing to explore
+        time.sleep(3)
 
             # receiving answer to valid syntax messages
            # elif 'syntax' == payload["type"]:
@@ -169,8 +158,6 @@ class Communication:
                # self.errors = message["payload"]["errors"]
 
                 # print("server sent '{}'".format(payload))
-
-
 
 
     # DO NOT EDIT THE METHOD SIGNATURE
@@ -193,14 +180,17 @@ class Communication:
         # topic = channel, message = String
         self.client.publish(topic, payload=message, qos=1)
 
+    # send ready message when robot is at first communication point
     def ready_message(self):
         message = {"from": "client", "type": "ready"}
         topic = "explorer/131"
         self.send_message(topic, json.dumps(message))
 
-    def path_message(self, Xs, Ys, Ds, Xe, Ye, De):   # Variablen von add path Fkt. noch einfügen/übergeben lassen
+    # send path which robot took to next communication point
+    def path_message(self, Xs, Ys, Ds, Xe, Ye, De):   # Variablen von add path Fkt. noch einfügen/übergeben lassen, mit Odometrie neue Position abschätzen
 
         # distinction between blocked and free path
+        # if start and end point are the same path is blocked, if not path is free
         if Xs == Xe and Ys == Ye:
             message = {
                 "from": "client",
@@ -233,12 +223,13 @@ class Communication:
         topic = f"planet/{self.planetName}/131"  # adds planet name given from server
         self.send_message(topic, json.dumps(message))
 
-    def pathSelect_message(self, Xs, Ys, Ds):  # Variablen übergeben lassen
+    # before taking new path robot sends choice of direction to mothership
+    def pathSelect_message(self, Xs, Ys, Ds):  # to do: Variablen übergeben lassen
         message = {
             "from": "client",
             "type": "pathSelect",
             "payload": {
-                "startX":   Xs,
+                "startX": Xs,
                 "startY": Ys,
                 "startDirection": Ds
             }
@@ -246,7 +237,7 @@ class Communication:
         topic = f"planet/{self.planetName}/131"
         self.send_message(topic, json.dumps(message))
 
-
+    # if target reached send message to mothership
     def targetReached_message(self):
         message = {
             "from": "client",
@@ -258,6 +249,7 @@ class Communication:
         topic = "explorer/131"
         self.send_message(topic, json.dumps(message))
 
+    # if exploration is completed send message to mothership
     def explorationCompleted_message(self):
         message = {
             "from": "client",
@@ -269,6 +261,7 @@ class Communication:
         topic = "explorer/131"
         self.send_message(topic, json.dumps(message))
 
+    #löschen für Prüfung
     def testplanet_message(self):
         self.planetName = input()
         message = {

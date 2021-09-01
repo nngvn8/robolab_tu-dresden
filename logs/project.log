@@ -566,3 +566,119 @@
 2021-09-01 10:49:08,391: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
 2021-09-01 10:49:08,392: Send to: planet/Gromit/131
 2021-09-01 10:49:08,392: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180, \"endX\": -2, \"endY\": -2, \"endDirection\": 0, \"pathStatus\": \"blocked\"}}"
+2021-09-01 12:16:11,887: Send to: explorer/131
+2021-09-01 12:16:11,889: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 12:16:11,889: Send to: explorer/131
+2021-09-01 12:16:11,889: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-09-01 12:16:11,890: Send to: planet/Gromit/131
+2021-09-01 12:16:11,890: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180, \"endX\": -2, \"endY\": -2, \"endDirection\": 0, \"pathStatus\": \"blocked\"}}"
+2021-09-01 12:20:00,372: Send to: explorer/131
+2021-09-01 12:20:00,373: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 12:20:00,373: Send to: explorer/131
+2021-09-01 12:20:00,373: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-09-01 12:20:00,374: Send to: planet/Gromit/131
+2021-09-01 12:20:00,374: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180, \"endX\": -2, \"endY\": -2, \"endDirection\": 180, \"pathStatus\": \"blocked\"}}"
+2021-09-01 13:35:55,450: Send to: explorer/131
+2021-09-01 13:35:55,452: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 13:35:55,453: Send to: explorer/131
+2021-09-01 13:35:55,453: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-09-01 13:35:55,453: Send to: planet/Gromit/131
+2021-09-01 13:35:55,453: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180, \"endX\": -2, \"endY\": -2, \"endDirection\": 0, \"pathStatus\": \"blocked\"}}"
+2021-09-01 13:45:23,993: Send to: explorer/131
+2021-09-01 13:45:23,995: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 13:45:23,996: Send to: explorer/131
+2021-09-01 13:45:23,996: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-09-01 13:45:23,996: Send to: planet/Gromit/131
+2021-09-01 13:45:23,996: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180, \"endX\": -2, \"endY\": -2, \"endDirection\": 180, \"pathStatus\": \"blocked\"}}"
+2021-09-01 13:45:23,996: Send to: planet/Gromit/131
+2021-09-01 13:45:23,996: "{\"from\": \"client\", \"type\": \"pathSelect\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180}}"
+2021-09-01 13:46:46,876: Send to: explorer/131
+2021-09-01 13:46:46,878: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 13:46:46,878: Send to: planet/Gromit/131
+2021-09-01 13:46:46,878: "{\"from\": \"client\", \"type\": \"pathSelect\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180}}"
+2021-09-01 13:48:24,249: Send to: explorer/131
+2021-09-01 13:48:24,250: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 13:48:24,251: Send to: planet/Gromit/131
+2021-09-01 13:48:24,251: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180, \"endX\": -2, \"endY\": -2, \"endDirection\": 180, \"pathStatus\": \"blocked\"}}"
+2021-09-01 13:48:24,251: Send to: planet/Gromit/131
+2021-09-01 13:48:24,252: "{\"from\": \"client\", \"type\": \"pathSelect\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180}}"
+2021-09-01 13:49:26,777: Send to: explorer/131
+2021-09-01 13:49:26,778: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 13:49:26,779: Send to: explorer/131
+2021-09-01 13:49:26,779: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-09-01 13:49:26,779: Send to: planet/Gromit/131
+2021-09-01 13:49:26,779: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180, \"endX\": -2, \"endY\": -2, \"endDirection\": 180, \"pathStatus\": \"blocked\"}}"
+2021-09-01 13:49:26,779: Send to: planet/Gromit/131
+2021-09-01 13:49:26,780: "{\"from\": \"client\", \"type\": \"pathSelect\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180}}"
+2021-09-01 13:52:56,283: Send to: explorer/131
+2021-09-01 13:52:56,284: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 13:52:56,285: Send to: explorer/131
+2021-09-01 13:52:56,285: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-09-01 13:52:56,285: Send to: planet/Gromit/131
+2021-09-01 13:52:56,286: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180, \"endX\": -2, \"endY\": -2, \"endDirection\": 180, \"pathStatus\": \"blocked\"}}"
+2021-09-01 13:52:56,286: Send to: planet/Gromit/131
+2021-09-01 13:52:56,286: "{\"from\": \"client\", \"type\": \"pathSelect\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180}}"
+2021-09-01 13:54:06,404: Send to: explorer/131
+2021-09-01 13:54:06,405: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 13:54:06,406: Send to: explorer/131
+2021-09-01 13:54:06,406: "{\"from\": \"client\", \"type\": \"ready\"}"
+2021-09-01 13:54:06,406: Send to: planet/Gromit/131
+2021-09-01 13:54:06,406: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180, \"endX\": -2, \"endY\": -2, \"endDirection\": 180, \"pathStatus\": \"blocked\"}}"
+2021-09-01 13:55:11,209: Send to: explorer/131
+2021-09-01 13:55:11,211: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 13:55:11,212: Send to: planet/Gromit/131
+2021-09-01 13:55:11,212: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180, \"endX\": -2, \"endY\": -2, \"endDirection\": 180, \"pathStatus\": \"blocked\"}}"
+2021-09-01 13:57:27,052: Send to: explorer/131
+2021-09-01 13:57:27,053: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 13:57:27,054: Send to: planet/Gromit/131
+2021-09-01 13:57:27,054: "{\"from\": \"client\", \"type\": \"pathSelect\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180}}"
+2021-09-01 13:57:27,054: Send to: planet/Gromit/131
+2021-09-01 13:57:27,054: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180, \"endX\": -2, \"endY\": -2, \"endDirection\": 180, \"pathStatus\": \"blocked\"}}"
+2021-09-01 13:58:22,014: Send to: explorer/131
+2021-09-01 13:58:22,016: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 13:58:22,016: Send to: planet/Gromit/131
+2021-09-01 13:58:22,017: "{\"from\": \"client\", \"type\": \"pathSelect\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180}}"
+2021-09-01 13:58:22,017: Send to: planet/Gromit/131
+2021-09-01 13:58:22,017: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180, \"endX\": -2, \"endY\": -2, \"endDirection\": 180, \"pathStatus\": \"blocked\"}}"
+2021-09-01 13:58:22,017: Send to: planet/Gromit/131
+2021-09-01 13:58:22,018: "{\"from\": \"client\", \"type\": \"pathSelect\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180}}"
+2021-09-01 14:03:09,870: Send to: explorer/131
+2021-09-01 14:03:09,872: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 14:03:09,872: Send to: planet/Gromit/131
+2021-09-01 14:03:09,873: "{\"from\": \"client\", \"type\": \"pathSelect\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180}}"
+2021-09-01 14:03:09,873: Send to: planet/Gromit/131
+2021-09-01 14:03:09,873: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180, \"endX\": -2, \"endY\": -2, \"endDirection\": 180, \"pathStatus\": \"blocked\"}}"
+2021-09-01 14:03:09,874: Send to: planet/Gromit/131
+2021-09-01 14:03:09,874: "{\"from\": \"client\", \"type\": \"pathSelect\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180}}"
+2021-09-01 14:05:27,755: Send to: explorer/131
+2021-09-01 14:05:27,756: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 14:05:27,756: Send to: planet/Gromit/131
+2021-09-01 14:05:27,756: "{\"from\": \"client\", \"type\": \"pathSelect\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180}}"
+2021-09-01 14:05:27,756: Send to: planet/Gromit/131
+2021-09-01 14:05:27,757: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180, \"endX\": -2, \"endY\": -2, \"endDirection\": 180, \"pathStatus\": \"blocked\"}}"
+2021-09-01 14:05:27,757: Send to: planet/Gromit/131
+2021-09-01 14:05:27,757: "{\"from\": \"client\", \"type\": \"pathSelect\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180}}"
+2021-09-01 14:20:20,228: Send to: explorer/131
+2021-09-01 14:20:20,229: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 14:20:20,230: Send to: planet/Gromit/131
+2021-09-01 14:20:20,230: "{\"from\": \"client\", \"type\": \"pathSelect\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180}}"
+2021-09-01 14:20:20,231: Send to: planet/Gromit/131
+2021-09-01 14:20:20,231: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180, \"endX\": -2, \"endY\": -2, \"endDirection\": 180, \"pathStatus\": \"blocked\"}}"
+2021-09-01 14:20:20,231: Send to: planet/Gromit/131
+2021-09-01 14:20:20,231: "{\"from\": \"client\", \"type\": \"pathSelect\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180}}"
+2021-09-01 14:21:56,373: Send to: explorer/131
+2021-09-01 14:21:56,375: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 14:21:56,376: Send to: planet/Gromit/131
+2021-09-01 14:21:56,376: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180, \"endX\": -2, \"endY\": -2, \"endDirection\": 180, \"pathStatus\": \"blocked\"}}"
+2021-09-01 14:21:56,376: Send to: planet/Gromit/131
+2021-09-01 14:21:56,376: "{\"from\": \"client\", \"type\": \"pathSelect\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180}}"
+2021-09-01 14:24:33,303: Send to: explorer/131
+2021-09-01 14:24:33,303: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 14:24:33,304: Send to: planet/Gromit/131
+2021-09-01 14:24:33,304: "{\"from\": \"client\", \"type\": \"path\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180, \"endX\": -2, \"endY\": -2, \"endDirection\": 180, \"pathStatus\": \"blocked\"}}"
+2021-09-01 14:24:33,304: Send to: planet/Gromit/131
+2021-09-01 14:24:33,304: "{\"from\": \"client\", \"type\": \"pathSelect\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180}}"
+2021-09-01 14:29:40,559: Send to: explorer/131
+2021-09-01 14:29:40,560: "{\"from\": \"client\", \"type\": \"testplanet\", \"payload\": {\"planetName\": \"Gromit\"}}"
+2021-09-01 14:29:40,560: Send to: planet/Gromit/131
+2021-09-01 14:29:40,560: "{\"from\": \"client\", \"type\": \"pathSelect\", \"payload\": {\"startX\": -2, \"startY\": -2, \"startDirection\": 180}}"
