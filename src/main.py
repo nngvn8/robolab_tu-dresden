@@ -40,29 +40,36 @@ def run():
 
     robot = Robot()
 
-    # 10 laps
-    robot.left_motor.reset()
-    robot.right_motor.reset()
-    while True:
-        try:
-            robot.rotate()
-        except KeyboardInterrupt:
-            print(f"left_motor position: {robot.left_motor.position}")
-            print(f"right_motor position: {robot.right_motor.position}")
-            break
+    # # 10 laps
+    # robot.left_motor.reset()
+    # robot.right_motor.reset()
+    # while True:
+    #     try:
+    #         robot.rotate()
+    #     except KeyboardInterrupt:
+    #         print(f"left_motor position: {robot.left_motor.position}")
+    #         print(f"right_motor position: {robot.right_motor.position}")
+    #         robot.left_motor.stop(stop_action='hold')
+    #         robot.right_motor.stop(stop_action='hold')
+    #         break
 
-    while True:
-        if robot.found_node():
-            robot.enter_node()
-            robot.odometry.det_new_pos()
-            robot.stop()
-            print(f"edges: {robot.scan_for_edges()}")  # only if node not already known!
-            # break
-        elif robot.found_obstacle():
-            robot.turn(180)
-            pass
-        else:
-            robot.follow_line()
+    # while True:
+    #     robot.follow_line()
+    #     if robot.found_obstacle():
+    #         robot.turn_around()
+    robot.turn_to_direction(180)
+    # while True:
+    #     if robot.found_node():
+    #         robot.enter_node()
+    #         robot.odometry.det_new_pos()
+    #         robot.stop()
+    #         print(f"edges: {robot.scan_for_edges()}")  # only if node not already known!
+    #         # break
+    #     elif robot.found_obstacle():
+    #         # robot.turn(180)
+    #         pass
+    #     else:
+    #         robot.follow_line()
 
 
     print(f"length of array with motor positions: {len(robot.odometry.motor_positions)}")

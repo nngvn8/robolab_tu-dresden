@@ -27,6 +27,17 @@ try:
 except KeyboardInterrupt:
     print(time.time() - start_time)
 
+speed = 100
+    turn = 620/4
+    robot.left_motor.reset()
+    robot.right_motor.reset()
+    while robot.left_motor.position < turn:
+        robot.left_motor.run_forever(speed_sp=speed)
+        robot.right_motor.run_forever(speed_sp=-speed)
+
+
+
+
 # measure time for rotation at certain speed
 start_time = time.time()
 

@@ -10,7 +10,7 @@ class Robot:
     TICKS360 = 620
     LUM_STOP_LINE = 200
 
-    def __init__(self, movement_speed=200, rotation_speed=200):
+    def __init__(self, movement_speed=200, rotation_speed=100):
 
         # initialize motors
         self.default_speed = movement_speed  # never slower than 25, or better 30
@@ -20,9 +20,11 @@ class Robot:
         self.left_motor.stop_action = "brake"
         self.right_motor.stop_action = "brake"
 
-        # initialize color sensor
+        # initialize color sensor and ultrasonic sensor
         self.color_sensor = ev3.ColorSensor()
         self.color_sensor.mode = 'RGB-RAW'
+        self.ultrasonic_sensor = ev3.UltrasonicSensor()
+        self.ultrasonic_sensor.mode = 'US-DIST-CM'
 
         # initialize pid controller
         self.pid_controller = PIDController()
@@ -36,7 +38,7 @@ class Robot:
         self.motor_pos_ct_T = 10
 
         # odometry information
-        self.direction = 0
+        self.direction = 270
         self.x_coord = 0
         self.y_coord = 0
 
@@ -63,8 +65,32 @@ class Robot:
         self.left_motor.run_forever(speed_sp=speed)
         self.right_motor.run_forever(speed_sp=-speed)
 
-    def turn(self, degree=90):
-        self.turn_w_ticks(degree, -30)
+    def turn_to_direction(self, direction):
+        if self.direction == direction:
+            return
+
+        turn_deg = (direction - self.direction) % 360
+
+        # turn left if shorter
+        if turn_deg == 270:
+            turn_deg = -90
+
+        print(f"turn_deg: {turn_deg}")
+
+        # make turn with offset
+        if turn_deg == -90:
+            self.turn_w_ticks(turn_deg, -20)
+        else:
+            self.turn_w_ticks(turn_deg, -60)
+
+        # find line (just use follow line?)
+        while self.calc_luminance() > self.LUM_STOP_LINE:
+            self.left_motor.run_forever(speed_sp=self.rotation_speed)
+            self.right_motor.run_forever(speed_sp=-self.rotation_speed)
+
+    def turn_around(self):
+        self.direction = (self.direction + 180) % 360
+        self.turn_w_ticks(180, -30)
         while self.calc_luminance() > self.LUM_STOP_LINE:
             self.left_motor.run_forever(speed_sp=self.rotation_speed)
             self.right_motor.run_forever(speed_sp=-self.rotation_speed)
@@ -72,23 +98,24 @@ class Robot:
         self.right_motor.stop(stop_action='hold')
 
     def turn_w_ticks(self, degree=90, offset=0, speed=None):
-        turn = round(degree*2*0.95)
-        # turn = round(self.TICKS360 / 360 * degree) + offset
+        # turn = round(degree*2*0.95)
+        turn = round(self.TICKS360 / 360 * degree) + offset
+        print(f"turn: {turn}")
+
         if speed is None:
             speed = self.rotation_speed
-        self.left_motor.run_to_rel_pos(position_sp=turn, speed_sp=speed)
-        self.right_motor.run_to_rel_pos(position_sp=-turn, speed_sp=-speed)
-        while self.left_motor.is_running and self.right_motor.is_running:
-            pass
-        self.left_motor.stop(stop_action='hold')
-        self.right_motor.stop(stop_action='hold')
+        if degree < 0:
+            speed = -speed
+        print(f"speed: {speed}")
 
-    def turn_w_time(self, degree=90):
-        turning_time = self.TIME360_AT100 * degree / 360
-        start_time = time.time()
-        while time.time() - start_time <= turning_time + 0.1:
-            self.rotate()
-        self.stop()
+        self.left_motor.reset()
+        self.right_motor.reset()
+        print(f"left_motor_pos: {self.left_motor.position}")
+
+        while abs(self.left_motor.position) < abs(turn):
+            self.left_motor.run_forever(speed_sp=speed)
+            self.right_motor.run_forever(speed_sp=-speed)
+
 
     def stop(self):
         self.left_motor.stop()
@@ -108,6 +135,8 @@ class Robot:
         self.pid_controller.adjust_motors(luminance, self)
 
     def found_obstacle(self):
+        if self.ultrasonic_sensor.distance_centimeters < 11:
+            return True
         return False
 
     def found_node(self):
@@ -183,34 +212,3 @@ class Robot:
 
         print(f"Motor Position: {self.left_motor.position}")
         return edges
-
-    def find_edges_old(self):
-        edges = []
-        m_pos_ctr = 1
-        self.left_motor.reset()
-        self.right_motor.reset()
-        turn = 360*2*0.90
-        while self.left_motor.position < turn and self.right_motor.position > -turn:
-            self.rotate()
-            luminance = self.calc_luminance()
-            print(luminance)
-            if luminance < 70 and m_pos_ctr == 2:
-                edges.append('a')
-                m_pos_ctr = 1
-            else:
-                m_pos_ctr += 1
-        self.left_motor.stop(stop_action='hold')
-        self.right_motor.stop(stop_action='hold')
-        return edges
-
-
-    def get_cur_voltage(self):
-        voltage_file = open('/sys/class/power_supply/lego-ev3-battery/voltage_now')
-        return int(voltage_file.read())
-
-    def get_cur_current(self):
-        current_file = open('/sys/class/power_supply/lego-ev3-battery/current_now')
-        return int(current_file.read())
-
-
-
