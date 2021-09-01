@@ -126,7 +126,7 @@ class Communication:
 
                 # print("server sent '{}'".format(payload))
 
-            # receiving answer to path unveiled messages
+            # receiving path unveiled messages
             elif 'pathUnveiled' == payload["type"]:
                 self.startX = message["payload"]["startX"]
                 self.startY = message["payload"]["startY"]
@@ -246,8 +246,23 @@ class Communication:
         topic = f"planet/{self.planetName}/131"
         self.send_message(topic, json.dumps(message))
 
-    def pathUnveiled_message(self):
-        pass
+    def pathUnveiled_message(self, Xs, Ys, Ds, Xe, Ye, De):  # Variablen übergeben lassen
+        message = {
+            "from": "client",
+            "type": "path",
+            "payload": {
+                "startX": Xs,
+                "startY": Ys,
+                "startDirection": Ds,
+                "endX": Xe,
+                "endY": Ye,
+                "endDirection": De,
+                "pathStatus": "blocked"
+            }
+        }
+
+        topic = f"planet/{self.planetName}/131"  # adds planet name given from server
+        self.send_message(topic, json.dumps(message))
 
     def targetReached_message(self):
         message = {

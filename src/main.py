@@ -42,9 +42,9 @@ def run():
     #channel on server = explorer/131 (String), message = json script
     #ready.send_message("explorer/131", '{"from": "client","type": "ready"} ')
     ready.testplanet_message()
-    ready.ready_message()
-    #ready.pathSelect_message(-1, -2, 0)
-    ready.path_message(-1, -2, 0, -1, -1, 0)
+    #ready.ready_message()
+    ready.path_message(-2, -2, 180, -2, -2, 0)
+    #ready.pathSelect_message(-2, -2, 270)
 
 
 
