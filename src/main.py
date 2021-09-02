@@ -23,7 +23,7 @@ def run():
     # Your script isn't able to close the client after crashing.
     global client
 
-    client_id = 'YOURGROUPID-' + str(uuid.uuid4())  # Replace YOURGROUPID with your group ID
+    client_id = '131' + str(uuid.uuid4())  # Replace YOURGROUPID with your group ID
     client = mqtt.Client(client_id=client_id,  # Unique Client-ID to recognize our program
                          clean_session=True,  # We want a clean session after disconnect or abort/crash
                          protocol=mqtt.MQTTv311  # Define MQTT protocol version
@@ -39,6 +39,7 @@ def run():
     # ADD YOUR OWN IMPLEMENTATION HEREAFTER.
 
     robot = Robot()
+    communication = Communication(client, logger)
 
     # go to first Node
     # while True:
