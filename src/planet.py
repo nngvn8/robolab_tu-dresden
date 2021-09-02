@@ -4,15 +4,19 @@
 # Attention: Do not import the ev3dev.ev3 module in this file
 from enum import IntEnum, unique
 from typing import List, Tuple, Dict, Union
+from math import inf
 
 
 @unique
 class Direction(IntEnum):
     """ Directions in shortcut """
-    NORTH = 0
+    NORTH = 0   
     EAST = 90
     SOUTH = 180
     WEST = 270
+
+
+
 
 
 Weight = int
@@ -23,8 +27,57 @@ Value:  -1 if blocked path
         >0 for all other paths
         never 0
 """
+#***************************************************************************************************
+def Dijkstra(Graph,Startknoten):
+    abstand  = {}
+    vorgänger = {}
+    Q = []
+    initialisiere(Graph,Startknoten,abstand,vorgänger,Q)    #Abstand, vorgänger = array/list, Q maybe dict
+    while bool(Q):                                          #entferne u aus Q     -    für u ist der kürzeste Weg nun bestimmt
+        u = min(Q)                                          #u = Knoten in Q mit kleinstem Wert in abstand[]
+        del Q[u]                                            #entferne u aus Q      -      für u ist der kürzeste Weg nun bestimmt
+        c = b[(0,3)].values()
+        nachbarn = []
+        for i in c:
+            nachbarn.append(i[0])
+        for v in nachbarn:                                  #für jeden Nachbarn v von u:
+            if v in Q:                                      #falls v in Q:    -      falls noch nicht berechnet
+                distanz_update(u,v,abstand,vorgänger)                           #distanz_update(u,v,abstand[],vorgänger[])  -     prüfe Abstand vom Startknoten zu v 
+    return vorgänger                                    #return vorgänger[]
+
+def initialisiere(Graph,Startknoten,abstand,vorgänger,Q):   #abstand,vorgänger = array/list, Q = dict
+    abstand = Graph                                  #für jeden Knoten v in Graph:
+    vorgänger = Graph                                #besser umstrukturiert
+    for v in abstand:
+        abstand[v] = inf                                    #abstand[v]:= unendlich
+    for v in vorgänger:
+        vorgänger[v] = None                                 #vorgänger[v]:= null
+    abstand[Startknoten] = 0                                #abstand[Startknoten]:= 0
+    Q = Graph.keys()                                        #Q:= Die Menge aller Knoten in Graph
 
 
+def distanz_update(u,v,abstand,vorgänger):          #abstand und vorgänger -> List/array
+    alternativ = abstand[u] + abstand_zwischen(u,v) #alternativ:= abstand[u] + abstand_zwischen(u, v)   // Weglänge vom Startknoten nach v über u
+    if alternativ < abstand[v]:                     #falls alternativ < abstand[v]:
+        abstand[v] = alternativ                     #abstand[v]:= alternativ
+        vorgänger[v] = u                            #vorgänger[v]:= u
+
+
+def erstelleKürzestenPfad(Zielknoten,vorgänger):   #vorgänger = array/list
+    Weg = Zielknoten                               #Weg[]:= [Zielknoten]
+    u = Zielknoten                                 #u:= Zielknoten
+    while bool(vorgänger[u]):                      #solange vorgänger[u] nicht null:   // Der Vorgänger des Startknotens ist null
+        u = vorgänger[u]                           #u:= vorgänger[u]
+        Weg.insert(0,u)                            #füge u am Anfang von Weg[] ein
+    return Weg                                     #return Weg[]
+
+
+def abstand_zwischen(n1,n2):
+    return Graph[n1][n2]    
+
+
+
+#*************************************************************************
 
 class Planet:
     """
@@ -58,7 +111,7 @@ class Planet:
         target_x, target_y = target2        #get coordinates from target
 
         if start2 in self.map: 
-            if target_direction not in self.map[start2]: #not sure if it checks whats in the Tuple -> checks for (x,y) not for the y in itself
+            if start_direction not in self.map[start2]: #not sure if it checks whats in the Tuple -> checks for (x,y) not for the y in itself
                 paths = self.map[start2] #gets to already mapped paths so they dont get overwritten
                 paths[start_direction] = (target2,target_direction,weight)    
                 self.map[start2] = paths #should work properly
@@ -67,10 +120,12 @@ class Planet:
         else:
                 paths = {start_direction : (target2,target_direction,weight)}
                 self.map[start2] = paths #should work properly 
+        
+                
         #basically the same as above, just reversed bc it is supposed to add a bidirectional path
 
         if target2 in self.map:
-            if start_direction not in self.map[target2]:
+            if target_direction not in self.map[target2]:
                 paths = self.map[target2] 
                 paths[target_direction] = (start2,start_direction,weight)
                 self.map[target2] = paths 
@@ -78,11 +133,7 @@ class Planet:
             paths = {target_direction : (start2,start_direction,weight)}
             self.map[target2] = paths
         
-
-        if start2 == target2:
-            paths = self.map[target2]
-            paths[target_direction] = (start2,start_direction,weight)    
-            self.map[target2] = paths
+ 
 
 
     def get_paths(self) -> Dict[Tuple[int, int], Dict[Direction, Tuple[Tuple[int, int], Direction, Weight]]]:
@@ -107,7 +158,7 @@ class Planet:
 
         # YOUR CODE FOLLOWS (remove pass, please!)
 
-        return self.map #too good to be true ?
+        return self.map 
 
 
     def shortest_path(self, start: Tuple[int, int], target: Tuple[int, int]) -> Union[None, List[Tuple[Tuple[int, int], Direction]]]:
@@ -124,20 +175,5 @@ class Planet:
 
         # YOUR CODE FOLLOWS (remove pass, please!)
         pass
+        #steht testweise am anfang
 
-
-     
-    
-
-
-#********************-tests-************************************************************
-
-a = Planet()
-
-a.add_path(((0, 3), Direction.NORTH), ((0, 3), Direction.WEST), 1)
-a.add_path(((1, 3), Direction.EAST), ((2, 3), Direction.WEST), 1)
-
-
-b = a.get_paths()
-print(type(b)) #returns dict :)
-print(b)
