@@ -27,57 +27,6 @@ Value:  -1 if blocked path
         >0 for all other paths
         never 0
 """
-#***************************************************************************************************
-def Dijkstra(Graph,Startknoten):
-    abstand  = {}
-    vorgänger = {}
-    Q = []
-    initialisiere(Graph,Startknoten,abstand,vorgänger,Q)    #Abstand, vorgänger = array/list, Q maybe dict
-    while bool(Q):                                          #entferne u aus Q     -    für u ist der kürzeste Weg nun bestimmt
-        u = min(Q)                                          #u = Knoten in Q mit kleinstem Wert in abstand[]
-        del Q[u]                                            #entferne u aus Q      -      für u ist der kürzeste Weg nun bestimmt
-        c = b[(0,3)].values()
-        nachbarn = []
-        for i in c:
-            nachbarn.append(i[0])
-        for v in nachbarn:                                  #für jeden Nachbarn v von u:
-            if v in Q:                                      #falls v in Q:    -      falls noch nicht berechnet
-                distanz_update(u,v,abstand,vorgänger)                           #distanz_update(u,v,abstand[],vorgänger[])  -     prüfe Abstand vom Startknoten zu v 
-    return vorgänger                                    #return vorgänger[]
-
-def initialisiere(Graph,Startknoten,abstand,vorgänger,Q):   #abstand,vorgänger = array/list, Q = dict
-    abstand = Graph                                  #für jeden Knoten v in Graph:
-    vorgänger = Graph                                #besser umstrukturiert
-    for v in abstand:
-        abstand[v] = inf                                    #abstand[v]:= unendlich
-    for v in vorgänger:
-        vorgänger[v] = None                                 #vorgänger[v]:= null
-    abstand[Startknoten] = 0                                #abstand[Startknoten]:= 0
-    Q = Graph.keys()                                        #Q:= Die Menge aller Knoten in Graph
-
-
-def distanz_update(u,v,abstand,vorgänger):          #abstand und vorgänger -> List/array
-    alternativ = abstand[u] + abstand_zwischen(u,v) #alternativ:= abstand[u] + abstand_zwischen(u, v)   // Weglänge vom Startknoten nach v über u
-    if alternativ < abstand[v]:                     #falls alternativ < abstand[v]:
-        abstand[v] = alternativ                     #abstand[v]:= alternativ
-        vorgänger[v] = u                            #vorgänger[v]:= u
-
-
-def erstelleKürzestenPfad(Zielknoten,vorgänger):   #vorgänger = array/list
-    Weg = Zielknoten                               #Weg[]:= [Zielknoten]
-    u = Zielknoten                                 #u:= Zielknoten
-    while bool(vorgänger[u]):                      #solange vorgänger[u] nicht null:   // Der Vorgänger des Startknotens ist null
-        u = vorgänger[u]                           #u:= vorgänger[u]
-        Weg.insert(0,u)                            #füge u am Anfang von Weg[] ein
-    return Weg                                     #return Weg[]
-
-
-def abstand_zwischen(n1,n2):
-    return Graph[n1][n2]    
-
-
-
-#*************************************************************************
 
 class Planet:
     """
@@ -89,6 +38,8 @@ class Planet:
         """ Initializes the data structure """
         self.target = None
         self.map = {} #initalizes a dict named map to store all the nodes and their paths
+        self.task_done = False
+        self.type_task_done = ""
 
     def add_path(self, start: Tuple[Tuple[int, int], Direction], target: Tuple[Tuple[int, int], Direction],
                  weight: int):
@@ -158,7 +109,7 @@ class Planet:
 
         # YOUR CODE FOLLOWS (remove pass, please!)
 
-        return self.map 
+        return self.map     
 
 
     def shortest_path(self, start: Tuple[int, int], target: Tuple[int, int]) -> Union[None, List[Tuple[Tuple[int, int], Direction]]]:
@@ -172,8 +123,45 @@ class Planet:
         :param target: 2-Tuple
         :return: 2-Tuple[List, Direction]
         """
+    ################################  initialisierung
+        abstand = copy.deepcopy(map)   
+        vorgänger = copy.deepcopy(map)                                   
+        for v in map:
+            vorgänger[v] = None 
+            abstand[v] = 999 #spaghetti
+        abstand[Startknoten] = 0        
+          ################################ 
+        NodeWO = copy.deepcopy(list(map.keys()))
+        #abstandhelp = copy.deepcopy(abstand)
+        while bool(NodeWO):   
+            #u = min(abstandhelp,key = abstandhelp.get) #u:= Knoten in Q mit kleinstem Wert in abstand[]
+        
+            u = next(iter(NodeWO))
+            for it in abstand:
+                if abstand[it] < abstand[u] and it in NodeWO:
+                    u = it
+            NodeWO.remove(u)
+            #del abstandhelp[u]
+            nachbarn = []
+            for i in map[u]:
+                nachbarn.append(map[u][i][0])
+            for v in nachbarn: 
+                if v in NodeWO:                    
+        ########################################################## distanz_update
+                    abstanduv = 0
+                    for o in map[u]:
+                        if map[u][o][0] == v:
+                            abstanduv = map[u][o][2]
+                    alternativ = abstand[u] + abstanduv    
+                    if alternativ < abstand[v]:     
+                        abstand[v] = alternativ                    
+                        vorgänger[v] = u
 
-        # YOUR CODE FOLLOWS (remove pass, please!)
-        pass
-        #steht testweise am anfang
+        #####################################################
+        Weg = [Zielknoten]
+        ab = Zielknoten
+        while bool(vorgänger[ab]):  #Der Vorgänger des Startknotens ist null
+            ab = vorgänger[ab]
+            Weg.insert(0,ab)
+        return Weg         
 
