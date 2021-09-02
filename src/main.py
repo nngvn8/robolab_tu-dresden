@@ -40,8 +40,6 @@ def run():
 
     robot = Robot()
 
-    start_time = time.time()
-
     # go to first Node
     # while True:
     #     robot.follow_line()
@@ -52,7 +50,6 @@ def run():
     #         COMMUNICATION TELLS US THE NODE WE ARE ON
     #         robot.odometry.set_even_odd_nodes(node_x, node_y)
     #         break
-    #
 
     # work on Planet
     while True:
@@ -75,14 +72,6 @@ def run():
             robot.turn_around()
         else:
             robot.follow_line()
-
-
-
-
-    print(time.time() - start_time)
-
-
-
 
 
 # DO NOT EDIT
