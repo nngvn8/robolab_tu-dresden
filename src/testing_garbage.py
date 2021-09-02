@@ -43,6 +43,17 @@ while True:
         robot.right_motor.stop(stop_action='hold')
         break
 
+while True:
+    try:
+        robot.forward()
+        robot.odometry.add_motor_pos(robot)
+    except KeyboardInterrupt:
+        robot.stop()
+        break
+robot.odometry.det_new_pos(robot)
+print(f"left motor pos: {robot.left_motor.position}")
+print(f"left motor pos: {robot.right_motor.position}")
+
 # test turns
 speed = 100
 turn = 620/4

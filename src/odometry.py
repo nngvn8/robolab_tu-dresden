@@ -5,22 +5,28 @@ from math import sin, cos, pi, floor, ceil
 class Odometry:
 
     WHEEL_DISTANCE = 100  # 88 # 105 middle to middle but 105 much better  # middle to middle
-    DISTANCE_PER_TICK = 2500 / 5140  # 0.41 # mm / tick    ## BEFORE: pi * 55 / 360  # pi * d / number_ticks360 in mm / tick
+    DISTANCE_PER_TICK = 2000 / 4225 # 4230  # 0.41 # mm / tick    ## BEFORE: pi * 55 / 360  # pi * d / number_ticks360 in mm / tick
 
     def __init__(self, even_node="blue", odd_node="red"):
         self.motor_positions = []
         self.even_node = even_node
         self.odd_node = odd_node
 
-    def set_even_uneven_nodes(self, node_x, node_y):
+    def init(self, node_x, node_y, direction, robot):
+
+        robot.x_coord = node_x
+        robot.y_coord = node_y
+        robot.direction = direction
+
+        # set odd and even node
         if (node_x + node_y) % 2 == 0:
-            self.even_node = self.robot.node_found
+            self.even_node = robot.node_found
             if self.even_node == "blue":
                 self.odd_node = "red"
             else:
                 self.odd_node = "blue"
         else:
-            self.odd_node = self.robot.node_found
+            self.odd_node = robot.node_found
             if self.odd_node == "red":
                 self.even_node = "blue"
             else:
@@ -62,9 +68,9 @@ class Odometry:
 
         x = robot.x_coord + dist_trav_x / 500
         y = robot.y_coord + dist_trav_y / 500
-        # x = round(x / 500)
-        # y = round(y / 500)
-        x, y = self.closest_possible_xy(x, y, robot.node_found)
+        x = round(x)
+        y = round(y)
+        # x, y = self.closest_possible_xy(x, y, robot.node_found)
 
         print(f"x: {x}")
         print(f"y: {y}")
@@ -73,6 +79,7 @@ class Odometry:
         robot.x_coord = x
         robot.y_coord = y
         robot.direction = direction
+        robot.current_node = (x, y, (direction + 180) % 360)
 
         self.motor_positions = []
 

@@ -19,7 +19,7 @@ class Communication:
     thereby solve the task according to the specifications
     """
 
-    def __init__(self, mqtt_client, logger):
+    def __init__(self, mqtt_client, logger, planet):
         """
         Initializes communication module, connect to server, subscribe, etc.
         :param mqtt_client: paho.mqtt.client.Client
@@ -51,6 +51,7 @@ class Communication:
         """
 
         # global variable declarations
+        self.planet = planet
         self.planetName = ""
         self.startX = None
         self.startY = None
@@ -62,10 +63,9 @@ class Communication:
         self.endDirection = None
         self.pathStatus = None
         self.pathWeight = None
-        self.targetX = None
-        self.targetY = None
         self.msg = None
         self.errors = None
+        self.task_done = False
 
 
     # DO NOT EDIT THE METHOD SIGNATURE
@@ -83,58 +83,66 @@ class Communication:
         # YOUR CODE FOLLOWS (remove pass, please!)
 
         # filter for server messages only (not messages roboter send)
-        if 'server' == payload["from"]:
-
+        if payload["from"] == 'server':
+            self.startDirectionC = None
             # receiving answer to ready messages
-            if 'planet' == payload["type"]:
+            if payload["type"] == 'planet':
 
-                self.planetName = message["payload"]["planetName"]
-                self.startX = message["payload"]["startX"]
-                self.startY = message["payload"]["startY"]
-                self.startOrientation = message["payload"]["startOrientation"]
+                self.planetName = payload["payload"]["planetName"]
+                self.startX = payload["payload"]["startX"]
+                self.startY = payload["payload"]["startY"]
+                self.startOrientation = payload["payload"]["startOrientation"]
 
                 # subscription to planet topic
                 self.client.subscribe(f"planet/{self.planetName}/131", qos=1)  # adds planet name
 
             # receiving answer to testplanet messages
             elif 'notice' == payload["type"]:
-                self.msg = message["payload"]["message"]
+                self.msg = payload["payload"]["message"]
 
             # receiving answer to path messages with corrected coordinates and path weight
             elif 'path' == payload["type"]:
-                self.startX = message["payload"]["startX"]
-                self.startY = message["payload"]["startY"]
-                self.startDirection = message["payload"]["startDirection"]
-                self.endX = message["payload"]["endX"]
-                self.endY = message["payload"]["endY"]
-                self.endDirection = message["payload"]["endDirection"]
-                self.pathStatus = message["payload"]["pathStatus"]
-                self.pathWeight = message["payload"]["pathWeight"]
+                self.startX = payload["payload"]["startX"]
+                self.startY = payload["payload"]["startY"]
+                self.startDirection = payload["payload"]["startDirection"]
+                self.endX = payload["payload"]["endX"]
+                self.endY = payload["payload"]["endY"]
+                self.endDirection = payload["payload"]["endDirection"]
+                self.pathStatus = payload["payload"]["pathStatus"]
+                self.pathWeight = payload["payload"]["pathWeight"]
+
+                self.planet.add_path(((self.startX, self.startY), self.startDirection), \
+                                     ((self.endX, self.endY), self.endDirection), \
+                                     self.pathWeight)
 
                 # add path von Tom um pfade in Karte aufzunehmen
 
             # receiving answer to path select messages if robot is supposed to go somewhere else than selected
-            elif 'pathSelect' == payload["type"]:
-                if 'blocked' == payload["payload"]["pathStatus"]:
-                    self.startDirectionC = message["payload"]["startDirection"]
+            elif payload["type"] == 'pathSelect':
+                self.startDirectionC = payload["payload"]["startDirection"]
 
             # receiving path unveiled messages if known path was free but is now blocked
             elif 'pathUnveiled' == payload["type"]:
-                self.startX = message["payload"]["startX"]
-                self.startY = message["payload"]["startY"]
-                self.startDirection = message["payload"]["startDirection"]
-                self.endX = message["payload"]["endX"]
-                self.endY = message["payload"]["endY"]
-                self.endDirection = message["payload"]["endDirection"]
-                self.pathStatus = message["payload"]["pathStatus"]
-                self.pathWeight = message["payload"]["pathWeight"]
+                startX = payload["payload"]["startX"]
+                startY = payload["payload"]["startY"]
+                startDirection = payload["payload"]["startDirection"]
+                endX = payload["payload"]["endX"]
+                endY = payload["payload"]["endY"]
+                endDirection = payload["payload"]["endDirection"]
+                pathStatus = payload["payload"]["pathStatus"]
+                pathWeight = payload["payload"]["pathWeight"]
 
-                #in karte aufnehmen
+                self.planet.add_path(((startX, startY), startDirection), \
+                                     ((endX, endY), endDirection), \
+                                     pathWeight)
+                # in karte aufnehmen
 
             # receiving target messages if robot needs to go to target shortest path possible
             elif 'target' == payload["type"]:
-                self.targetX = message["payload"]["targetX"]
-                self.targetY = message["payload"]["targetY"]
+                targetX = payload["payload"]["targetX"]
+                targetY = payload["payload"]["targetY"]
+
+                self.planet.target = (targetX, targetY)
 
             # receiving answer to exploration completed/target reached messages
             elif 'done' == payload["type"]:
@@ -144,7 +152,6 @@ class Communication:
                 self.client.disconnect()
 
         # robot waits 3s before continuing to explore
-        time.sleep(3)
 
             # receiving answer to valid syntax messages
            # elif 'syntax' == payload["type"]:
@@ -179,6 +186,7 @@ class Communication:
         # send message to mothership
         # topic = channel, message = String
         self.client.publish(topic, payload=message, qos=1)
+        time.sleep(2)
 
     # send ready message when robot is at first communication point
     def ready_message(self):
@@ -187,11 +195,18 @@ class Communication:
         self.send_message(topic, json.dumps(message))
 
     # send path which robot took to next communication point
-    def path_message(self, Xs, Ys, Ds, Xe, Ye, De):   # Variablen von add path Fkt. noch einfügen/übergeben lassen, mit Odometrie neue Position abschätzen
+    def path_message(self, starting_node, end_node, blocked=False):   # Variablen von add path Fkt. noch einfügen/übergeben lassen, mit Odometrie neue Position abschätzen
+        Xs = starting_node[0]
+        Ys = starting_node[1]
+        Ds = starting_node[2]
+
+        Xe = end_node[0]
+        Ye = end_node[1]
+        De = end_node[2]
 
         # distinction between blocked and free path
         # if start and end point are the same path is blocked, if not path is free
-        if Xs == Xe and Ys == Ye:
+        if blocked:
             message = {
                 "from": "client",
                 "type": "path",
@@ -261,14 +276,21 @@ class Communication:
         topic = "explorer/131"
         self.send_message(topic, json.dumps(message))
 
+    def wait(self, waiting_time=3):
+
+        starting_time = time.time()
+        while time.time() < starting_time + waiting_time:
+            pass
+
+
     #löschen für Prüfung
-    def testplanet_message(self):
-        self.planetName = input()
+    def testplanet_message(self, planet_name):
+        self.planetName = planet_name #input()
         message = {
             "from": "client",
             "type": "testplanet",
             "payload": {
-                "planetName": f"{self.planetName}"
+                "planetName": f"{planet_name}"
             }
         }
         topic = "explorer/131"

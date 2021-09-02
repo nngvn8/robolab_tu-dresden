@@ -40,10 +40,11 @@ class Robot:
 
         # odometry information
         self.direction = 0
-        self.x_coord = 1
+        self.x_coord = 0
         self.y_coord = 0
 
         self.last_node = (0, 0, 0)
+        self.current_node = (0, 0, 0)
 
         self.TIME360_AT100 = 5.7
 
@@ -106,7 +107,7 @@ class Robot:
     def turn_w_ticks(self, degree=90, offset=0, speed=None):
         # turn = round(degree*2*0.95)
         turn = round(self.TICKS360 / 360 * degree) + offset
-
+ 
         if speed is None:
             speed = self.rotation_speed
         if degree < 0:
@@ -122,6 +123,14 @@ class Robot:
     def stop(self):
         self.left_motor.stop()
         self.right_motor.stop()
+    def reset(self):
+        self.left_motor.reset()
+        self.right_motor.reset()
+
+    def set_pos_and_dir(self, x_coord, y_coord, node_direction):
+        self.x_coord = x_coord
+        self.y_coord = y_coord
+        self.direction = (node_direction + 180) % 360
 
     def follow_line(self):
         luminance = self.calc_luminance()

@@ -33,6 +33,8 @@ class Planet:
     def __init__(self):
         """ Initializes the data structure """
         self.target = None
+        self.task_done = False
+        self.type_task_done = ""
 
     def add_path(self, start: Tuple[Tuple[int, int], Direction], target: Tuple[Tuple[int, int], Direction],
                  weight: int):
