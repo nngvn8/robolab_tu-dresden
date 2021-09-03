@@ -5,6 +5,7 @@
 from enum import IntEnum, unique
 from typing import List, Tuple, Dict, Union
 from math import inf
+import copy
 
 
 @unique
@@ -40,13 +41,16 @@ class Planet:
         self.map = {} #initalizes a dict named map to store all the nodes and their paths
         self.task_done = False
         self.type_task_done = ""
-        self.unknown_paths = {}  #change to nodes_w_open_edges
+        self.open_nodes = []
+        self.unveiled_nodes = []
+        self.meteor_nodes = []
+
 
     def add_path(self, start: Tuple[Tuple[int, int], Direction], target: Tuple[Tuple[int, int], Direction],
                  weight: int):
         """
          Adds a bidirectional path defined between the start and end coordinates to the map and assigns the weight to it
-
+         
         Example:
             add_path(((0, 3), Direction.NORTH), ((0, 3), Direction.WEST), 1)
         :param start: 2-Tuple
@@ -61,6 +65,10 @@ class Planet:
         start_x, start_y = start2           #get coordinates from start
         target2, target_direction = target  #get directions from target
         target_x, target_y = target2        #get coordinates from target
+
+        # {(x,y):[SOUTH,NORTH]}
+
+
 
         if start2 in self.map: 
             if start_direction not in self.map[start2]: #not sure if it checks whats in the Tuple -> checks for (x,y) not for the y in itself
@@ -116,12 +124,12 @@ class Planet:
      
         abstand = copy.deepcopy(map)   
         vorgänger = copy.deepcopy(map)                                   
-        for v in map:
+        for v in self.map:
             vorgänger[v] = None 
-            abstand[v] = 999 #spaghetti
+            abstand[v] = inf
         abstand[Startknoten] = 0        
           ################################ 
-        NodeWO = copy.deepcopy(list(map.keys()))
+        NodeWO = copy.deepcopy(list(self.map.keys()))
         #abstandhelp = copy.deepcopy(abstand)
         while bool(NodeWO):   
             #u = min(abstandhelp,key = abstandhelp.get) #u:= Knoten in Q mit kleinstem Wert in abstand[]
@@ -133,15 +141,15 @@ class Planet:
             NodeWO.remove(u)
             #del abstandhelp[u]
             nachbarn = []
-            for i in map[u]:
-                nachbarn.append(map[u][i][0])
+            for i in self.map[u]:
+                nachbarn.append(self.map[u][i][0])
             for v in nachbarn: 
                 if v in NodeWO:                    
         ########################################################## distanz_update
                     abstanduv = 0
-                    for o in map[u]:
-                        if map[u][o][0] == v:
-                            abstanduv = map[u][o][2]
+                    for o in self.map[u]:
+                        if self.map[u][o][0] == v:
+                            abstanduv = self.map[u][o][2]
                     alternativ = abstand[u] + abstanduv    
                     if alternativ < abstand[v]:     
                         abstand[v] = alternativ                    
@@ -160,15 +168,20 @@ class Planet:
         iter2 = 1
         for i in Weg:
             currentweight = inf
-            for direction in map[i]:
+            for direction in self.map[i]:
                 print(direction)
                 if iter2 < len(Weg):
-                    if Weg[iter2] == map[i][direction][0] and map[i][direction][2] < currentweight:
+                    if Weg[iter2] == self.map[i][direction][0] and self.map[i][direction][2] < currentweight:
                         currentdirection = direction
-                        currentweight = map[i][direction][2]
+                        currentweight = self.map[i][direction][2]
         
             ret.append((i,currentdirection))
             print(Weg)
             iter2 += 1
         ret.pop()
         return ret
+
+
+
+
+  
