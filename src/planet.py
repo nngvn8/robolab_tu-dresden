@@ -40,9 +40,10 @@ class Planet:
         self.target = None
         self.map = {} #initalizes a dict named map to store all the nodes and their paths
         self.task_done = False
-        self.type_task_done = ""
-        self.open_nodes = []
-        self.unveiled_nodes = []
+        self.type_task = ""
+        self.list_open_nodes = []
+        self.edges_open_node = {}
+        self.scanned_nodes = []
         self.meteor_nodes = []
 
 
@@ -67,6 +68,22 @@ class Planet:
         target_x, target_y = target2        #get coordinates from target
 
         # {(x,y):[SOUTH,NORTH]}
+
+
+        if start2 in list_open_nodes:
+            if start_direction in edges_open_nodes[start2]:
+                edges_open_nodes[start2].remove(start_direction)
+            if len(edges_open_nodes[start2]) <= 0:
+                del edges_open_nodes[start2]
+                list_open_nodes.remove(start2)
+
+        if target2 in list_open_nodes:
+            if target_direction in edges_open_nodes[target2]:
+                edges_open_nodes[target2].remove(target_direction)
+
+            if len(edges_open_nodes[target2]) <= 0:
+                del edges_open_nodes[target2]
+                list_open_nodes.remove(target2)
 
 
 
@@ -122,45 +139,41 @@ class Planet:
 
     def shortest_path(self, start: Tuple[int, int], target: Tuple[int, int]) -> Union[None, List[Tuple[Tuple[int, int], Direction]]]:
      
-        abstand = copy.deepcopy(map)   
-        vorgänger = copy.deepcopy(map)                                   
-        for v in self.map:
-            vorgänger[v] = None 
-            abstand[v] = inf
-        abstand[Startknoten] = 0        
-          ################################ 
+        distance = copy.deepcopy(map)   
+        predecessor = copy.deepcopy(map)                                   
+        for i in self.map:
+            predecessor[i] = None 
+            distance[i] = inf
+        distance[Startknoten] = 0        
         NodeWO = copy.deepcopy(list(self.map.keys()))
-        #abstandhelp = copy.deepcopy(abstand)
-        while bool(NodeWO):   
-            #u = min(abstandhelp,key = abstandhelp.get) #u:= Knoten in Q mit kleinstem Wert in abstand[]
-        
+        while bool(NodeWO):     
             u = next(iter(NodeWO))
-            for it in abstand:
-                if abstand[it] < abstand[u] and it in NodeWO:
+            for it in distance:
+                if distance[it] < distance[u] and it in NodeWO:
                     u = it
             NodeWO.remove(u)
-            #del abstandhelp[u]
+            #del distancehelp[u]
             nachbarn = []
             for i in self.map[u]:
                 nachbarn.append(self.map[u][i][0])
             for v in nachbarn: 
                 if v in NodeWO:                    
         ########################################################## distanz_update
-                    abstanduv = 0
+                    distanceuv = 0
                     for o in self.map[u]:
                         if self.map[u][o][0] == v:
-                            abstanduv = self.map[u][o][2]
-                    alternativ = abstand[u] + abstanduv    
-                    if alternativ < abstand[v]:     
-                        abstand[v] = alternativ                    
-                        vorgänger[v] = u
+                            distanceuv = self.map[u][o][2]
+                    alternativ = distance[u] + distanceuv    
+                    if alternativ < distance[v]:     
+                        distance[v] = alternativ                    
+                        predecessor[v] = u
 
         #####################################################
         Weg = [Zielknoten]
         ab = Zielknoten
 
-        while bool(vorgänger[ab]):  #Der Vorgänger des Startknotens ist null
-            ab = vorgänger[ab]
+        while bool(predecessor[ab]):  #Der predecessor des Startknotens ist null
+            ab = predecessor[ab]
             Weg.insert(0,ab)
         ret = []
         currentdirection = Direction.SOUTH
@@ -169,19 +182,61 @@ class Planet:
         for i in Weg:
             currentweight = inf
             for direction in self.map[i]:
-                print(direction)
                 if iter2 < len(Weg):
                     if Weg[iter2] == self.map[i][direction][0] and self.map[i][direction][2] < currentweight:
                         currentdirection = direction
                         currentweight = self.map[i][direction][2]
         
             ret.append((i,currentdirection))
-            print(Weg)
             iter2 += 1
         ret.pop()
         return ret
 
 
+    ################################################################
+    """
+    list_nodes = [(1,2),(2,3)]
+
+    directions_open_node = {
+                    (1,2) : [NORTH,SOUTH,EAST],
+
+                    (2,3) : [EAST]
+                 }
+    """
+
+    def add_open_node(self,node,direction):
+
+        if node in map:
+            if direction not in map[node]:  
+                if node in list_open_nodes:
+                    self_open_node[node].append(direction)
+                else:
+                    list_open_nodes.append(node)
+                    self.edges_open_node[node] = [direction]
+
+        if node in list_open_nodes:
+            self_open_node[node].append(direction)
+        else:
+            list_open_nodes.append(node)
+            self.edges_open_node[node] = [direction]
 
 
-  
+
+    def shortest_open_node(self, start):
+        currentdistance = inf
+        shortest_path = None
+        for node in list_nodes:
+            path = shortespath(start,node)
+            currentweight = 0
+            start_node = node
+            for end_node in path:
+                currentweight += map[start_node][end_node][2]
+                start_node = end_node
+            if currentdistance > currentweight:
+                currentdistance = currentweight
+                shortest_path = path
+        return shortest_path
+
+
+
+
