@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+    #!/usr/bin/env python3
 
 import unittest
 from planet import Direction, Planet
@@ -52,7 +52,7 @@ class TestRoboLabPlanet(unittest.TestCase):
 
     def test_integrity(self):
         """
-        This test should check that the dictionary returned by "planet.get_paths()" matches the expected structure
+        This test should check that the dictionary returned by "planet.get_paths()" matches the     expected structure
         """
         self.fail('implement me!')
 

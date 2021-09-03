@@ -147,7 +147,7 @@ class Robot:
         self.pid_controller.adjust_motors(luminance, self)
 
     def found_obstacle(self):
-        if self.ultrasonic_sensor.distance_centimeters < 11:
+        if self.ultrasonic_sensor.distance_centimeters < 15:
             return True
         return False
 
