@@ -132,10 +132,19 @@ class Communication:
                 pathStatus = payload["payload"]["pathStatus"]
                 pathWeight = payload["payload"]["pathWeight"]
 
+                # add open node
+                self.planet.add_open_node((startX, startY), startDirection)
+                self.planet.add_open_node((endX, endY), endDirection)
+
+                # add edges to map
                 self.planet.add_path(((startX, startY), startDirection), \
                                      ((endX, endY), endDirection), \
                                      pathWeight)
-                # in karte aufnehmen
+
+                if (startX, startY) != (endX, endY) and pathStatus == "blocked":
+                    self.planet.meteor_nodes.append((startX, startY, startDirection))
+                    self.planet.meteor_nodes.append((endX, endY, endDirection))
+
 
             # receiving target messages if robot needs to go to target shortest path possible
             elif 'target' == payload["type"]:

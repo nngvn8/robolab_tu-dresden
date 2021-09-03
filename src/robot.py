@@ -107,7 +107,7 @@ class Robot:
     def turn_w_ticks(self, degree=90, offset=0, speed=None):
         # turn = round(degree*2*0.95)
         turn = round(self.TICKS360 / 360 * degree) + offset
- 
+
         if speed is None:
             speed = self.rotation_speed
         if degree < 0:
@@ -123,6 +123,7 @@ class Robot:
     def stop(self):
         self.left_motor.stop()
         self.right_motor.stop()
+
     def reset(self):
         self.left_motor.reset()
         self.right_motor.reset()
@@ -136,7 +137,7 @@ class Robot:
         luminance = self.calc_luminance()
 
         # add every tenth motor position
-        if self.motor_pos_ctr == 10:
+        if self.motor_pos_ctr == self.motor_pos_ct_T:
             self.odometry.add_motor_pos(self)
             # print(f"{self.odometry.motor_positions[-1]}")
             self.motor_pos_ctr = 1
@@ -219,12 +220,24 @@ class Robot:
             # store found edge
             print(self.left_motor.position * 1.3 / 2)
             current_rotation = round(self.left_motor.position * 1.3 / 2 / 90) * 90
-            edges.append((self.direction + current_rotation) % 360)
+
+            # dont add edge where we came from
+            if current_rotation != 180:
+                edges.append(current_rotation)
+
 
             # get away from black line
             self.left_motor.run_to_rel_pos(position_sp=40, speed_sp=self.rotation_speed)
             self.right_motor.run_to_rel_pos(position_sp=-40, speed_sp=-self.rotation_speed)
             self.right_motor.wait_until_not_moving()
+
+        # move 0 to the end
+        if 0 in edges:
+            edges = edges[1:] + edges[:1]
+
+        # transfrom to coordinates
+        for i in range(len(edges)):
+            edges[i] = (edges[i] + self.direction) % 360
 
         return edges
 

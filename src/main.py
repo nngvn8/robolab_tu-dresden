@@ -42,7 +42,7 @@ def run():
     planet = Planet()
     communication = Communication(client, logger, planet)
 
-    # go to first Node
+    # GO TO FIRST NODE
     while True:
         robot.follow_line()
         if robot.found_node():
@@ -50,16 +50,50 @@ def run():
             robot.enter_node()
             robot.stop()
 
-            # scan for edges
-            edges = robot.scan_for_edges()
-
             # initialialize communication and odometry
-            communication.testplanet_message("Gromit")  #################### to be removed!!!
+            communication.testplanet_message("Boseman")  #################### to be removed!!!
             communication.ready_message()
             robot.odometry.init(communication.startX, communication.startY, communication.startOrientation, robot)
 
-            # determine new direction
-            direction = robot.direction  # INTELLIGENCE
+            # scan for edges
+            edges = robot.scan_for_edges()
+            planet.scanned_nodes.append((robot.x_coord, robot.y_coord))
+
+            for edge in edges:
+                planet.add_open_node((robot.x_coord, robot.y_coord), edge)
+
+            # DETERMINE NEW DIRECTION
+
+            # set target as not reachable and only change if it is
+            path_to_target = None
+            direction = None  #### ??
+
+            # if target set
+            if planet.traget is not None:
+                path_to_target = planet.shortest_path((robot.x_coord, robot.y_coord), planet.target)
+
+                # if reachable
+                if path_to_target is not None:
+                    direction = path_to_target[1]
+
+            # Exploration if no target or target not reachable
+            if planet.target is None or path_to_target is None:
+                open_edges = planet.open_nodes[(robot.x_coord, robot.y_coord)]
+
+                # open edges at current node
+                if open_edges != []:
+                    direction = open_edges[0]
+
+                # no open edges at current node
+                else:
+                    path_to_node = None
+                    # unveiled nodes left
+                    if planet.unveil_nodes != {} or path_to_node is None:
+                        path_to_node = planet.shortest_path(next(planet.unveil_nodes))
+                    else:
+                        planet.task_done = True
+
+                    direction = path_to_node[0][1]
 
             # submit chosen path, wait and exit communication
             communication.pathSelect_message(robot.x_coord, robot.y_coord, direction)
@@ -77,37 +111,68 @@ def run():
     # print(f"com_y: {communication.startY}")
     # print(f"com_dir: {communication.startOrientation}")
 
-    # work on Planet
+    # WORK ON PLANET
     while True:
 
         if robot.found_node():
             robot.stop()
             robot.enter_node()
-            robot.stop()
+            robot.reset()
 
-            # update position of robot
+            # update position of robots
             if not robot.on_ret_from_obst:
                 robot.odometry.det_new_pos(robot)
             else:
                 robot.set_pos_and_dir(robot.last_node[0], robot.last_node[1], robot.last_node[2])
-                robot.path_message()
-
-            # scan for edges
-            # only if node not already known!
-            edges = robot.scan_for_edges()
 
             # send driven path and correct position
             robot.current_node = (robot.x_coord, robot.y_coord, (robot.direction + 180) % 360)
             communication.path_message(robot.last_node, robot.current_node, robot.on_ret_from_obst)
             robot.set_pos_and_dir(communication.endX, communication.endY, communication.endDirection)
 
-            # determine new direction
-            direction = robot.direction  # INTELLIGENCE
+            if (robot.x_coord, robot.y_coord) == planet.target:
+                planet.task_done = True
+                planet.type_task_done = "target reached"
 
-            # submit chosen path, wait and exit communication
-            communication.pathSelect_message(robot.x_coord, robot.y_coord, direction)
-            communication.wait()
-            robot.play_sound()
+            # scan for edges
+            # only if node not already known!
+            if (robot.x_coord, robot.y_coord) not in planet.scanned_nodes:
+                edges = robot.scan_for_edges()
+                planet.scanned_nodes.append((robot.x_coord, robot.y_coord))
+                for edge in edges:
+                    planet.add_open_node((robot.x_coord, robot.y_coord), edge)
+
+            # DETERMINE NEW DIRECTION
+
+            # set target as not reachable and only change if it is
+            path_to_target = None
+
+            # if target set
+            if planet.traget is not None:
+                path_to_target = planet.shortest_path((robot.x_coord, robot.y_coord), planet.target)
+
+                # if reachable
+                if path_to_target is not None:
+                    direction = path_to_target[1]
+
+            # Exploration if no target or target not reachable
+            if planet.target is None or path_to_target is None:
+                open_edges = planet.edges_open_node[(robot.x_coord, robot.y_coord)]
+
+                # open edges at current node
+                if open_edges != []:
+                    direction = open_edges[0]
+
+                # no open edges at current node
+                else:
+                    path_to_node = None
+                    # nodes if open edges left
+                    if planet.open_nodes != {}:
+                        path_to_node = planet.closest_open_node((robot.x_coord, robot.y_coord))
+                    else:
+                        planet.task_done = True
+                        planet.type_task_done = "exploration completed"
+                    direction = path_to_node[0][1]
 
             # terminate if task done
             if planet.task_done:
@@ -117,37 +182,29 @@ def run():
                     communication.explorationCompleted_message()
                 break
 
-            # update direction and exit node
-            print(f"startDirection: {communication.startDirectionC}")
-            if communication.startDirectionC is not None:
+            # submit chosen path, wait and exit communication
+            communication.pathSelect_message(robot.x_coord, robot.y_coord, direction)
+            communication.wait()
+            robot.play_sound()
+
+            # update direction, turn and update
+            if communication.startDirectionC is not None \
+                    and (robot.x_coord, robot.y_coord, communication.startDirectionC) not in planet.meteor_nodes:
                 direction = communication.startDirectionC
             robot.turn_to_direction(direction)
             robot.last_node = (robot.x_coord, robot.y_coord, robot.direction)
+
+            # resetting
             robot.on_ret_from_obst = False
             robot.reset()
-            # break
+
         elif robot.found_obstacle():
             robot.play_sound()
             robot.on_ret_from_obst = True
             robot.turn_around()
+
         else:
             robot.follow_line()
-
-    # while True:
-    #     try:
-    #         if robot.found_node():
-    #             robot.stop()
-    #             robot.enter_node()
-    #             robot.stop()
-    #             robot.odometry.det_new_pos(robot)
-    #
-    #             # scan for edges
-    #             edges = robot.scan_for_edges()
-    #         else:
-    #             robot.follow_line()
-    #     except KeyboardInterrupt:
-    #         robot.stop()
-    #         break
 
 
 

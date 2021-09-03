@@ -51,6 +51,24 @@ while True:
         robot.stop()
         break
 robot.odometry.det_new_pos(robot)
+
+
+while True:
+    try:
+        if robot.found_node():
+            robot.stop()
+            robot.enter_node()
+            robot.stop()
+            robot.odometry.det_new_pos(robot)
+
+            # scan for edges
+            edges = robot.scan_for_edges()
+        else:
+            robot.follow_line()
+    except KeyboardInterrupt:
+        robot.stop()
+        break
+
 print(f"left motor pos: {robot.left_motor.position}")
 print(f"left motor pos: {robot.right_motor.position}")
 
