@@ -40,6 +40,7 @@ class Planet:
         self.map = {} #initalizes a dict named map to store all the nodes and their paths
         self.task_done = False
         self.type_task_done = ""
+        self.unknown_paths = {}  #change to nodes_w_open_edges
 
     def add_path(self, start: Tuple[Tuple[int, int], Direction], target: Tuple[Tuple[int, int], Direction],
                  weight: int):
@@ -111,19 +112,8 @@ class Planet:
 
         return self.map     
 
-
     def shortest_path(self, start: Tuple[int, int], target: Tuple[int, int]) -> Union[None, List[Tuple[Tuple[int, int], Direction]]]:
-        """
-        Returns a shortest path between two nodes
-
-        Examples:
-            shortest_path((0,0), (2,2)) returns: [((0, 0), Direction.EAST), ((1, 0), Direction.NORTH)]
-            shortest_path((0,0), (1,2)) returns: None
-        :param start: 2-Tuple
-        :param target: 2-Tuple
-        :return: 2-Tuple[List, Direction]
-        """
-    ################################  initialisierung
+     
         abstand = copy.deepcopy(map)   
         vorgänger = copy.deepcopy(map)                                   
         for v in map:
@@ -160,8 +150,25 @@ class Planet:
         #####################################################
         Weg = [Zielknoten]
         ab = Zielknoten
+
         while bool(vorgänger[ab]):  #Der Vorgänger des Startknotens ist null
             ab = vorgänger[ab]
             Weg.insert(0,ab)
-        return Weg         
+        ret = []
+        currentdirection = Direction.SOUTH
 
+        iter2 = 1
+        for i in Weg:
+            currentweight = inf
+            for direction in map[i]:
+                print(direction)
+                if iter2 < len(Weg):
+                    if Weg[iter2] == map[i][direction][0] and map[i][direction][2] < currentweight:
+                        currentdirection = direction
+                        currentweight = map[i][direction][2]
+        
+            ret.append((i,currentdirection))
+            print(Weg)
+            iter2 += 1
+        ret.pop()
+        return ret
