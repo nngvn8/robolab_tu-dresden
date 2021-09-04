@@ -56,15 +56,15 @@ def run():
             robot.odometry.init(communication.startX, communication.startY, communication.startOrientation, robot)
 
             # scan for edges
-            edges = robot.scan_for_edges()
+            open_edges = robot.scan_for_edges()
+            for edge in open_edges:
+                planet.add_open_node((robot.x_coord, robot.y_coord), edge)
             planet.scanned_nodes.append((robot.x_coord, robot.y_coord))
 
-            for edge in edges:
-                planet.add_open_node((robot.x_coord, robot.y_coord), edge)
 
             # DETERMINE NEW DIRECTION
 
-            # set target as not reachable and only change if it is
+            # set target as not reachable and only c    hange if it is
             path_to_target = None
             direction = None  #### ??
 
@@ -132,13 +132,12 @@ def run():
                 planet.task_done = True
                 planet.type_task_done = "target reached"
 
-            # scan for edges
-            # only if node not already known!
+            # scan node for edges if not already known
             if (robot.x_coord, robot.y_coord) not in planet.scanned_nodes:
-                edges = robot.scan_for_edges()
-                planet.scanned_nodes.append((robot.x_coord, robot.y_coord))
-                for edge in edges:
+                open_edges = robot.scan_for_edges()
+                for edge in open_edges:
                     planet.add_open_node((robot.x_coord, robot.y_coord), edge)
+                planet.scanned_nodes.append((robot.x_coord, robot.y_coord))
 
             # DETERMINE NEW DIRECTION
 
@@ -163,14 +162,17 @@ def run():
 
                 # no open edges at current node
                 else:
-                    path_to_node = None
-                    # nodes if open edges left
+                    # closest nodes with open edges left
                     if planet.open_nodes != []:
                         path_to_node = planet.closest_open_node((robot.x_coord, robot.y_coord))
+                        if path_to_node is not None:
+                            direction = path_to_node[0][1]
+                        else:  # unveiled nodes that cant be reached -> terminate exploration
+                            planet.task_done = True
+                            planet.type_task_done = "exploration completed"
                     else:
                         planet.task_done = True
                         planet.type_task_done = "exploration completed"
-                    direction = path_to_node[0][1]
 
             # terminate if task done
             if planet.task_done:

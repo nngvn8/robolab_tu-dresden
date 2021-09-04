@@ -136,7 +136,11 @@ class Planet:
         return self.map     
 
     def shortest_path(self, start: Tuple[int, int], target: Tuple[int, int]) -> Union[None, List[Tuple[Tuple[int, int], Direction]]]:
-     
+
+        # checks if we dont even know the start or target
+        if start not in self.map or target not in self.map:
+            return None
+
         distance = copy.deepcopy(self.map)
         predecessor = copy.deepcopy(self.map)
         for i in self.map:
@@ -149,6 +153,8 @@ class Planet:
             for it in distance:
                 if distance[it] < distance[u] and it in NodeWO:
                     u = it
+            if u == inf:
+                return None
             NodeWO.remove(u)
             #del distancehelp[u]
             nachbarn = []
@@ -205,8 +211,13 @@ class Planet:
     def add_open_node(self, node, direction):
 
         # dont add node if already in map
-        if node in self.map and direction in self.map[node]:
+        if node in self.scanned_nodes or (self.map[node].keySet()) == 4:
             return
+
+        if node in self.map and direction in self.map[node]:
+            if node not in self.open_nodes:
+                self.open_nodes.append(node)
+            self.edges_open_node[node] = []
 
         if node not in self.open_nodes:
             self.open_nodes.append(node)
@@ -214,18 +225,20 @@ class Planet:
         else:
             self.edges_open_node[node].append(direction)
 
-
-
     def closest_open_node(self, start):
         currentdistance = inf
         shortest_path = None
         for node in self.open_nodes:
-            path = self.shortest_path(start,node)
+            path = self.shortest_path(start, node)
+            if path is None:
+                continue
             currentweight = 0
-            start_node = node
-            for end_node in path:
-                currentweight += self.map[start_node][end_node][2]
-                start_node = end_node
+
+            # determine total weight of the path
+            for path_node in path:
+                currentweight += self.map[path_node[0]][path_node[1]][2]
+
+            # update node if shorter path
             if currentdistance > currentweight:
                 currentdistance = currentweight
                 shortest_path = path

@@ -205,41 +205,46 @@ class Robot:
                 self.right_motor.run_forever(speed_sp=-self.rotation_speed)
 
                 # stop scan_for_edges if original line found or 360
-                if self.left_motor.position > 550 and self.calc_luminance() < self.LUM_STOP_LINE or self.left_motor.position > turn:
+                if self.left_motor.position > 550 and self.calc_luminance() < self.LUM_STOP_LINE or \
+                        self.left_motor.position > turn:
                     self.left_motor.stop(stop_action='hold')
                     self.right_motor.stop(stop_action='hold')
                     breakout = True
                     break
 
-            # exit if original line found
+            # exit if original line found or 360
             if breakout:
                 break
 
             # remove stutter? -> other implementation needed
 
-            # store found edge
+            # calc direction of edge
             print(self.left_motor.position * 1.3 / 2)
             current_rotation = round(self.left_motor.position * 1.3 / 2 / 90) * 90
 
-            # dont add edge where we came from
+            # add edge, but only if its not 180 (because we already know it)
             if current_rotation != 180:
                 edges.append(current_rotation)
-
 
             # get away from black line
             self.left_motor.run_to_rel_pos(position_sp=40, speed_sp=self.rotation_speed)
             self.right_motor.run_to_rel_pos(position_sp=-40, speed_sp=-self.rotation_speed)
             self.right_motor.wait_until_not_moving()
 
-        # move 0 to the end
+        # order from right to left
+        edges_return = []
+        if 90 in edges:
+            edges_return.append(90)
         if 0 in edges:
-            edges = edges[1:] + edges[:1]
+            edges_return.append(0)
+        if 270 in edges:
+            edges_return.append(270)
 
         # transfrom to coordinates
-        for i in range(len(edges)):
-            edges[i] = (edges[i] + self.direction) % 360
+        for i in range(len(edges_return)):
+            edges_return[i] = (edges_return[i] + self.direction) % 360
 
-        return edges
+        return edges_return
 
     def scan_for_edges2(self):
         edges = []

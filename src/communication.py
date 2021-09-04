@@ -32,23 +32,11 @@ class Communication:
 
         self.logger = logger
 
-        # Add your client setup here
-
-        #self.client = mqtt.Client(client_id="131", clean_session=False, protocol=mqtt.MQTTv31)
+        # Client setup here
         self.client.username_pw_set('131', password='cxdOXaj4Q5')  # password from python test site
         self.client.connect("mothership.inf.tu-dresden.de", port=1883)  # connection to mothership
         self.client.subscribe('explorer/131', qos=1)  # topic subscription
         self.client.loop_start()
-
-        # muss das mit rein?
-        """
-        while True:
-            pass
-
-        self.client.loop_stop()
-        self.client.disconnect()
-        
-        """
 
         # global variable declarations
         self.planet = planet
@@ -67,7 +55,6 @@ class Communication:
         self.errors = None
         self.task_done = False
 
-
     # DO NOT EDIT THE METHOD SIGNATURE
     def on_message(self, client, data, message):   # for receiving messages from mothership
         """
@@ -79,8 +66,6 @@ class Communication:
         """
         payload = json.loads(message.payload.decode('utf-8'))
         self.logger.debug(json.dumps(payload, indent=2))
-
-        # YOUR CODE FOLLOWS (remove pass, please!)
 
         # filter for server messages only (not messages roboter send)
         if payload["from"] == 'server':
@@ -115,8 +100,6 @@ class Communication:
                                      ((self.endX, self.endY), self.endDirection), \
                                      self.pathWeight)
 
-                # add path von Tom um pfade in Karte aufzunehmen
-
             # receiving answer to path select messages if robot is supposed to go somewhere else than selected
             elif payload["type"] == 'pathSelect':
                 self.startDirectionC = payload["payload"]["startDirection"]
@@ -132,49 +115,32 @@ class Communication:
                 pathStatus = payload["payload"]["pathStatus"]
                 pathWeight = payload["payload"]["pathWeight"]
 
-                # add open node
-                self.planet.add_open_node((startX, startY), startDirection)
-                self.planet.add_open_node((endX, endY), endDirection)
-
                 # add edges to map
                 self.planet.add_path(((startX, startY), startDirection), \
                                      ((endX, endY), endDirection), \
                                      pathWeight)
 
+                # add open node
+                self.planet.add_open_node((startX, startY), startDirection)
+                self.planet.add_open_node((endX, endY), endDirection)
+
+                # to meteor_nodes if meteor shower occured
                 if (startX, startY) != (endX, endY) and pathStatus == "blocked":
                     self.planet.meteor_nodes.append((startX, startY, startDirection))
                     self.planet.meteor_nodes.append((endX, endY, endDirection))
-
 
             # receiving target messages if robot needs to go to target shortest path possible
             elif 'target' == payload["type"]:
                 targetX = payload["payload"]["targetX"]
                 targetY = payload["payload"]["targetY"]
 
+                # set as target in planet
                 self.planet.target = (targetX, targetY)
 
             # receiving answer to exploration completed/target reached messages
             elif 'done' == payload["type"]:
-                # exploration beenden lassen (Roboter stopp)
-
                 self.client.loop_stop()
                 self.client.disconnect()
-
-        # robot waits 3s before continuing to explore
-
-            # receiving answer to valid syntax messages
-           # elif 'syntax' == payload["type"]:
-             #   self.msg = message["payload"]["message"]
-
-                # print("server sent '{}'".format(payload))
-
-            # receiving answer to invalid syntax messages
-           # elif 'syntax' == payload["type"]:
-               # self.msg = message["payload"]["message"]
-               # self.errors = message["payload"]["errors"]
-
-                # print("server sent '{}'".format(payload))
-
 
     # DO NOT EDIT THE METHOD SIGNATURE
     #
@@ -190,8 +156,6 @@ class Communication:
         self.logger.debug('Send to: ' + topic)
         self.logger.debug(json.dumps(message, indent=2))
 
-        # YOUR CODE FOLLOWS (remove pass, please!)
-
         # send message to mothership
         # topic = channel, message = String
         self.client.publish(topic, payload=message, qos=1)
@@ -204,7 +168,7 @@ class Communication:
         self.send_message(topic, json.dumps(message))
 
     # send path which robot took to next communication point
-    def path_message(self, starting_node, end_node, blocked=False):   # Variablen von add path Fkt. noch einfügen/übergeben lassen, mit Odometrie neue Position abschätzen
+    def path_message(self, starting_node, end_node, blocked=False):
         Xs = starting_node[0]
         Ys = starting_node[1]
         Ds = starting_node[2]
@@ -248,7 +212,7 @@ class Communication:
         self.send_message(topic, json.dumps(message))
 
     # before taking new path robot sends choice of direction to mothership
-    def pathSelect_message(self, Xs, Ys, Ds):  # to do: Variablen übergeben lassen
+    def pathSelect_message(self, Xs, Ys, Ds):
         message = {
             "from": "client",
             "type": "pathSelect",
@@ -291,10 +255,9 @@ class Communication:
         while time.time() < starting_time + waiting_time:
             pass
 
-
-    #löschen für Prüfung
+    # not to be called in the exam
     def testplanet_message(self, planet_name):
-        self.planetName = planet_name #input()
+        self.planetName = planet_name
         message = {
             "from": "client",
             "type": "testplanet",
