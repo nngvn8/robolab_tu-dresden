@@ -79,8 +79,6 @@ class Robot:
         if turn_deg == 270:
             turn_deg = -90
 
-        print(f"turn_deg: {turn_deg}")
-
         # make turn with offset
         if turn_deg == -90:
             self.turn_w_ticks(turn_deg, -20)
@@ -152,20 +150,29 @@ class Robot:
         return False
 
     def found_node(self):
-
-        if self.color_sensor.red in range(90, 170) and self.color_sensor.green in range(0, 100) and self.color_sensor.blue in range(0, 75):
+        (red, green, blue) = self.color_sensor.raw
+        if red in range(90, 170) and green in range(0, 100) and blue in range(0, 75):
             self.node_found = "red"
+            print(f"color_node: {self.node_found}")
+            print(f"red: {red}")
+            print(f"green: {green}")
+            print(f"blue: {blue}")
             return True
 
-        if self.color_sensor.red in range(0, 40) and self.color_sensor.green in range(50, 150) and self.color_sensor.blue in range(50, 120):
+        if red in range(0, 40) and green in range(50, 150) and blue in range(60, 120):
             self.node_found = "blue"
+            print(f"color_node: {self.node_found}")
+            print(f"red: {red}")
+            print(f"green: {green}")
+            print(f"blue: {blue}")
             return True
 
         self.node_found = ""
         return False
 
     def calc_luminance(self):
-        return 0.2126 * self.color_sensor.red + 0.7152 * self.color_sensor.green + 0.0722 * self.color_sensor.blue
+        (red, green, blue) = self.color_sensor.raw
+        return 0.2126 * red + 0.7152 * green + 0.0722 * blue
 
     def play_sound(self):
         ev3.Sound.tone([(200, 100, 100), (500, 200)])
@@ -187,7 +194,7 @@ class Robot:
 
     def scan_for_edges(self):
         edges = []
-        turn = self.TICKS360 * 1
+        turn = self.TICKS360 * 0.95
         breakout = False
 
         # reset to use motor.position
@@ -219,7 +226,7 @@ class Robot:
             # remove stutter? -> other implementation needed
 
             # calc direction of edge
-            print(self.left_motor.position * 1.3 / 2)
+            # print(self.left_motor.position * 1.3 / 2)
             current_rotation = round(self.left_motor.position * 1.3 / 2 / 90) * 90
 
             # add edge, but only if its not 180 (because we already know it)

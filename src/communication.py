@@ -139,6 +139,8 @@ class Communication:
 
             # receiving answer to exploration completed/target reached messages
             elif 'done' == payload["type"]:
+                self.task_done = True
+                print("You have completed the task!")
                 self.client.loop_stop()
                 self.client.disconnect()
 

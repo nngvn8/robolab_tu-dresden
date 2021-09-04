@@ -57,9 +57,7 @@ class Planet:
         :param target:  2-Tuple
         :param weight: Integer
         :return: void
-        """ 
-            
-        # YOUR CODE FOLLOWS (remove pass, please!)
+        """
 
         start2, start_direction = start     #get directions from start
         start_x, start_y = start2           #get coordinates from start
@@ -85,7 +83,7 @@ class Planet:
 
 
 
-        if start2 in self.map: 
+        if start2 in self.map:
             if start_direction not in self.map[start2]: #not sure if it checks whats in the Tuple -> checks for (x,y) not for the y in itself
                 paths = self.map[start2] #gets to already mapped paths so they dont get overwritten
                 paths[start_direction] = (target2,target_direction,weight)    
@@ -153,7 +151,8 @@ class Planet:
             for it in distance:
                 if distance[it] < distance[u] and it in NodeWO:
                     u = it
-            if u == inf:
+            print(f"chosen distance u: {distance[u]}")
+            if distance[u] == inf:
                 return None
             NodeWO.remove(u)
             #del distancehelp[u]
@@ -167,6 +166,8 @@ class Planet:
                     for o in self.map[u]:
                         if self.map[u][o][0] == v:
                             distanceuv = self.map[u][o][2]
+                    if distanceuv < 0:
+                        continue
                     alternativ = distance[u] + distanceuv    
                     if alternativ < distance[v]:     
                         distance[v] = alternativ                    
@@ -179,6 +180,7 @@ class Planet:
         while bool(predecessor[ab]):  #Der predecessor des Startknotens ist null
             ab = predecessor[ab]
             Weg.insert(0,ab)
+
         ret = []
         currentdirection = Direction.SOUTH
 
@@ -211,7 +213,7 @@ class Planet:
     def add_open_node(self, node, direction):
 
         # dont add node if already in map
-        if node in self.scanned_nodes or (self.map[node].keySet()) == 4:
+        if node in self.scanned_nodes or node in self.map and (self.map[node].keys()) == 4:
             return
 
         if node in self.map and direction in self.map[node]:
@@ -219,7 +221,7 @@ class Planet:
                 self.open_nodes.append(node)
             self.edges_open_node[node] = []
 
-        if node not in self.open_nodes:
+        elif node not in self.open_nodes:
             self.open_nodes.append(node)
             self.edges_open_node[node] = [direction]
         else:
@@ -229,7 +231,9 @@ class Planet:
         currentdistance = inf
         shortest_path = None
         for node in self.open_nodes:
+            print(f"node: {node}")
             path = self.shortest_path(start, node)
+            print(f"path: {path}")
             if path is None:
                 continue
             currentweight = 0

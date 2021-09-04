@@ -50,8 +50,8 @@ def run():
             robot.enter_node()
             robot.stop()
 
-            # initialialize communication and odometry
-            communication.testplanet_message("Chadwick")  #################### to be removed!!!
+            # initialize communication and odometry
+            communication.testplanet_message("Mehl-M1")  #################### to be removed!!!
             communication.ready_message()
             robot.odometry.init(communication.startX, communication.startY, communication.startOrientation, robot)
 
@@ -74,7 +74,7 @@ def run():
 
                 # if reachable
                 if path_to_target is not None:
-                    direction = path_to_target[1]
+                    direction = path_to_target[0][1]
 
             # Exploration if no target or target not reachable
             if planet.target is None or path_to_target is None:
@@ -124,37 +124,54 @@ def run():
                 robot.set_pos_and_dir(robot.last_node[0], robot.last_node[1], robot.last_node[2])
 
             # send driven path and correct position
+            # communication sets task as done
             robot.current_node = (robot.x_coord, robot.y_coord, (robot.direction + 180) % 360)
             communication.path_message(robot.last_node, robot.current_node, robot.on_ret_from_obst)
             robot.set_pos_and_dir(communication.endX, communication.endY, communication.endDirection)
 
             if (robot.x_coord, robot.y_coord) == planet.target:
+                planet.target = None
                 planet.task_done = True
                 planet.type_task_done = "target reached"
 
             # scan node for edges if not already known
             if (robot.x_coord, robot.y_coord) not in planet.scanned_nodes:
                 open_edges = robot.scan_for_edges()
+
+                # add open edges/node if not already known
                 for edge in open_edges:
-                    planet.add_open_node((robot.x_coord, robot.y_coord), edge)
+                    if edge not in planet.map[(robot.x_coord, robot.y_coord)].keys():
+                        planet.add_open_node((robot.x_coord, robot.y_coord), edge)
+
+                # mark as scanned
                 planet.scanned_nodes.append((robot.x_coord, robot.y_coord))
+                print(f"scanned_nodes: {planet.scanned_nodes}")
+
+                # remove from open nodes if there are no open edges left
+                if (robot.x_coord, robot.y_coord) in planet.edges_open_node and planet.edges_open_node[(robot.x_coord, robot.y_coord)] == []:
+                    del planet.edges_open_node[(robot.x_coord, robot.y_coord)]
+                    planet.open_nodes.remove((robot.x_coord, robot.y_coord))
 
             # DETERMINE NEW DIRECTION
 
             # set target as not reachable and only change if it is
             path_to_target = None
 
+            print(f"map: {planet.map}")
+            print(f"target: {planet.target}")
             # if target set
             if planet.target is not None:
                 path_to_target = planet.shortest_path((robot.x_coord, robot.y_coord), planet.target)
+                print(f"path_to_target: {path_to_target}")
 
                 # if reachable
                 if path_to_target is not None:
-                    direction = path_to_target[1]
+                    direction = path_to_target[0][1]
 
             # Exploration if no target or target not reachable
             if planet.target is None or path_to_target is None:
                 open_edges = planet.get_open_edges((robot.x_coord, robot.y_coord))
+                print(f"local open edges: {open_edges}")
 
                 # open edges at current node
                 if open_edges != []:
@@ -162,9 +179,15 @@ def run():
 
                 # no open edges at current node
                 else:
+                    print(f"open nodes LIST: {planet.open_nodes}")
+                    print(f"open nodes: {planet.edges_open_node}")
+
                     # closest nodes with open edges left
                     if planet.open_nodes != []:
+                        # print(f"planet map: {planet.map}")
                         path_to_node = planet.closest_open_node((robot.x_coord, robot.y_coord))
+                        print(f"path to node: {path_to_node}")
+
                         if path_to_node is not None:
                             direction = path_to_node[0][1]
                         else:  # unveiled nodes that cant be reached -> terminate exploration
@@ -174,12 +197,16 @@ def run():
                         planet.task_done = True
                         planet.type_task_done = "exploration completed"
 
+            print(f"task done: {planet.task_done}")
             # terminate if task done
             if planet.task_done:
+                print(f"type task done: {planet.type_task_done}")
                 if planet.type_task_done == "target reached":
                     communication.targetReached_message()
                 elif planet.type_task_done == "exploration completed":
                     communication.explorationCompleted_message()
+
+            if communication.task_done:
                 break
 
             # submit chosen path, wait and exit communication
@@ -187,6 +214,7 @@ def run():
             communication.wait()
             robot.play_sound()
 
+            print(f"communication order: {communication.startDirectionC}")
             # update direction, turn and update
             if communication.startDirectionC is not None \
                     and (robot.x_coord, robot.y_coord, communication.startDirectionC) not in planet.meteor_nodes:

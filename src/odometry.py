@@ -72,9 +72,9 @@ class Odometry:
         y = round(y)
         # x, y = self.closest_possible_xy(x, y, robot.node_found)
 
+        print(f"direction (rounded): {direction}")
         print(f"x: {x}")
         print(f"y: {y}")
-        print(f"direction (rounded): {direction}")
 
         robot.x_coord = x
         robot.y_coord = y

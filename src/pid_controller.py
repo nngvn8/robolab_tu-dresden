@@ -5,9 +5,9 @@ class PIDController:
 
     def __init__(self):
         # k parameters times 100
-        self.kp = 35  # kc = 60
-        self.ki = 1
-        self.kd = 45  # 42.76
+        self.kp = 50  # kc = 60
+        self.ki = 4
+        self.kd = 20  # 42.76
         self.integral = 0
         self.last_error = 0
         self.offset = 170  # determined by experiment on line
