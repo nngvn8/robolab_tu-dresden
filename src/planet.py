@@ -83,28 +83,43 @@ class Planet:
 
 
 
-        if start2 in self.map:
-            if start_direction not in self.map[start2]: #not sure if it checks whats in the Tuple -> checks for (x,y) not for the y in itself
-                paths = self.map[start2] #gets to already mapped paths so they dont get overwritten
-                paths[start_direction] = (target2,target_direction,weight)    
-                self.map[start2] = paths #should work properly
-            #else would be pointless since on every node theres only one path in each direction
-
-        else:
-            paths = {start_direction : (target2,target_direction,weight)}
-            self.map[start2] = paths #should work properly
+        # if start2 in self.map:
+        #     if start_direction not in self.map[start2]: #not sure if it checks whats in the Tuple -> checks for (x,y) not for the y in itself
+        #         paths = self.map[start2] #gets to already mapped paths so they dont get overwritten
+        #         paths[start_direction] = (target2,target_direction,weight)
+        #         self.map[start2] = paths #should work properly
+        #     #else would be pointless since on every node theres only one path in each direction
+        #
+        # else:
+        #     paths = {start_direction : (target2,target_direction,weight)}
+        #     self.map[start2] = paths #should work properly
         
                 
         #basically the same as above, just reversed bc it is supposed to add a bidirectional path
 
         if target2 in self.map:
             if target_direction not in self.map[target2]:
-                paths = self.map[target2] 
+                paths = self.map[target2]
                 paths[target_direction] = (start2,start_direction,weight)
-                self.map[target2] = paths 
+                self.map[target2] = paths
         else:
             paths = {target_direction : (start2,start_direction,weight)}
             self.map[target2] = paths
+
+        if start2 not in self.map:
+            self.map[start2] = {}
+
+        if target2 not in self.map:
+            self.map[target2] = {}
+
+        # if start_direction not in self.map[start2]:
+        #     self.map[target2][start_direction] = {}
+        #
+        # if target_direction not in self.map[target2]:
+        #     self.map[target2][target_direction] = {}
+
+        self.map[start2][start_direction] = (target2, target_direction, weight)
+        self.map[target2][target_direction] = (start2, start_direction, weight)
         
  
 
@@ -135,69 +150,105 @@ class Planet:
 
     def shortest_path(self, start: Tuple[int, int], target: Tuple[int, int]) -> Union[None, List[Tuple[Tuple[int, int], Direction]]]:
 
+        ##- returns the shortest path between a give start (tuple of x and y coordinate) and a given target (tuple of x and y coordinate) -##
+        # - returns None if there is no possible path between those two nodes
+
         # checks if we dont even know the start or target
         if start not in self.map or target not in self.map:
             return None
-
+        # distance: dict of "keys who are already on the map" : "distance to start node"
         distance = copy.deepcopy(self.map)
+        # predecessor: dict of  "node" : "predecessor of said node"
         predecessor = copy.deepcopy(self.map)
         for i in self.map:
-            predecessor[i] = None 
+            # sets all predecessors to None
+            predecessor[i] = None
+            # sets all distances to infinity
             distance[i] = inf
+        # distance of startnode gets set to 0
         distance[start] = 0
-        NodeWO = copy.deepcopy(list(self.map.keys()))
-        while bool(NodeWO):     
-            u = next(iter(NodeWO))
-            for it in distance:
-                if distance[it] < distance[u] and it in NodeWO:
-                    u = it
-            print(f"chosen distance u: {distance[u]}")
-            if distance[u] == inf:
+        # unvisited_nodes: List of nodes where the shortest path hasnt been found yet
+        unvisited_nodes = copy.deepcopy(list(self.map.keys()))
+        while bool(unvisited_nodes):
+            # Node in unvisited_nodes with the smallest value in distance
+            closest_unvisited_node = next(iter(unvisited_nodes))
+            # goes through every node in distance to find the new closest unvisited node
+            for node in distance:
+                if distance[node] < distance[closest_unvisited_node] and node in unvisited_nodes:
+                    # updates closest_unvisited_node
+                    closest_unvisited_node = node
+            # print(f"distance to {closest_unvisited_node}: {distance[closest_unvisited_node]}")
+            if closest_unvisited_node == target:
+                break
+            # if the closest_unvisited_node is not reachable, the algorithm stops and returns None
+            if distance[closest_unvisited_node] == inf:
                 return None
-            NodeWO.remove(u)
-            #del distancehelp[u]
-            nachbarn = []
-            for i in self.map[u]:
-                nachbarn.append(self.map[u][i][0])
-            for v in nachbarn: 
-                if v in NodeWO:                    
-        ########################################################## distanz_update
-                    distanceuv = 0
-                    for o in self.map[u]:
-                        if self.map[u][o][0] == v:
-                            distanceuv = self.map[u][o][2]
-                    if distanceuv < 0:
+            # removes the closest_unvisited_node from unvisited_nodes because now it has been visited
+            unvisited_nodes.remove(closest_unvisited_node)
+            # temporary list of neighbours of the closest_unvisited_node
+            neighbours = []
+
+            # fills neighbours
+            for node in self.map[closest_unvisited_node]:
+                neighbours.append(self.map[closest_unvisited_node][node][0])
+
+            # goes through neighbours to see if any neighbour is an unvisited node
+            for neighbour in neighbours:
+                if neighbour in unvisited_nodes:
+                    # closest_unvisited_node becomes predecessor of neighbour if if the distance between the
+                    # two is shorter than the already known shortest_path
+                    distance_closest_unvisited_node_to_neighbour = 0
+                    # goes through every known path of closest_unvisited_node to see if
+                    # one of these paths goes to neighbour
+                    for direction in self.map[closest_unvisited_node]:
+                        if self.map[closest_unvisited_node][direction][0] == neighbour:
+                            # if so, it updates the distance_closed_unvisited_node_to_neighbour
+                            distance_closest_unvisited_node_to_neighbour = self.map[closest_unvisited_node][direction][
+                                2]
+
+                    # checks if the path between unvisited_node to neighbour isnt blocked
+                    if distance_closest_unvisited_node_to_neighbour < 0:
                         continue
-                    alternativ = distance[u] + distanceuv    
-                    if alternativ < distance[v]:     
-                        distance[v] = alternativ                    
-                        predecessor[v] = u
+                    alternative = distance[closest_unvisited_node] + distance_closest_unvisited_node_to_neighbour
 
-        #####################################################
-        Weg = [target]
-        ab = target
+                    # checks if alternaitve is faster than the already found path
+                    if alternative < distance[neighbour]:
+                        distance[neighbour] = alternative
+                        predecessor[neighbour] = closest_unvisited_node
 
-        while bool(predecessor[ab]):  #Der predecessor des Startknotens ist null
-            ab = predecessor[ab]
-            Weg.insert(0,ab)
+        path = [target]
+        cur_node = target
 
-        ret = []
-        currentdirection = Direction.SOUTH
+        # assembles the shortest path
+        while bool(predecessor[cur_node]):
+            cur_node = predecessor[cur_node]
+            path.insert(0, cur_node)
 
-        iter2 = 1
-        for i in Weg:
-            currentweight = inf
-            for direction in self.map[i]:
-                if iter2 < len(Weg):
-                    if Weg[iter2] == self.map[i][direction][0] and self.map[i][direction][2] < currentweight:
-                        currentdirection = direction
-                        currentweight = self.map[i][direction][2]
-        
-            ret.append((i,currentdirection))
-            iter2 += 1
-        ret.pop()
-        return ret
+        ###- add directions to the already assembled shortest_path -###
 
+        # empty list to fill with the shortest path + direction Tuples
+        path_with_directions = []
+        # sets the direction to a random direction
+        cur_direction = Direction.SOUTH
+
+        # goes through path to add the shortest path between two adjacent nodes in the already assembled shortest path
+        iterator = 1
+        for node in path:
+            # searches for the path with the smallest weight between those two nodes
+            cur_weight = inf
+            for direction in self.map[node]:
+                if iterator < len(path):
+                    # if a new smallest weight has been found it updates the cur_weight
+                    if path[iterator] == self.map[node][direction][0] and self.map[node][direction][2] < cur_weight:
+                        cur_direction = direction
+                        cur_weight = self.map[node][direction][2]
+
+            path_with_directions.append((node, cur_direction))
+            iterator += 1
+        # deletes the last element since its the target node
+        path_with_directions.pop()
+        # returns the shortest path
+        return path_with_directions
 
     ################################################################
     """
@@ -231,20 +282,18 @@ class Planet:
         currentdistance = inf
         shortest_path = None
         for node in self.open_nodes:
-            print(f"node: {node}")
             path = self.shortest_path(start, node)
-            print(f"path: {path}")
             if path is None:
                 continue
-            currentweight = 0
+            cur_weight = 0
 
             # determine total weight of the path
             for path_node in path:
-                currentweight += self.map[path_node[0]][path_node[1]][2]
+                cur_weight += self.map[path_node[0]][path_node[1]][2]
 
             # update node if shorter path
-            if currentdistance > currentweight:
-                currentdistance = currentweight
+            if currentdistance > cur_weight:
+                currentdistance = cur_weight
                 shortest_path = path
         return shortest_path
 

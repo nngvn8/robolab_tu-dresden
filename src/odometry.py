@@ -32,12 +32,13 @@ class Odometry:
             else:
                 self.odd_node = "red"
 
+        self.motor_positions = []
+
     def det_new_pos(self, robot):
 
         dist_trav_x = 0
         dist_trav_y = 0
 
-        print(f"starting direction: {robot.direction}")
         direction = self.cood_to_math(robot.direction)  # transform into math representation
         direction_rad = direction / 180 * pi                 # convert into radians
 

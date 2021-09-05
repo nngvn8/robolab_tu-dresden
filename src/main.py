@@ -51,7 +51,7 @@ def run():
             robot.stop()
 
             # initialize communication and odometry
-            communication.testplanet_message("Mehl-M1")  #################### to be removed!!!
+            communication.testplanet_message("Chadwick")  #################### to be removed!!!
             communication.ready_message()
             robot.odometry.init(communication.startX, communication.startY, communication.startOrientation, robot)
 
@@ -137,6 +137,7 @@ def run():
             # scan node for edges if not already known
             if (robot.x_coord, robot.y_coord) not in planet.scanned_nodes:
                 open_edges = robot.scan_for_edges()
+                print(f"scanned edges: {open_edges}")
 
                 # add open edges/node if not already known
                 for edge in open_edges:
@@ -157,7 +158,11 @@ def run():
             # set target as not reachable and only change if it is
             path_to_target = None
 
-            print(f"map: {planet.map}")
+            # print(f"MAP:")
+            # for node in planet.map:
+            #     print(f"{node}: {planet.map[node]}")
+            print(f"open nodes LIST: {planet.open_nodes}")
+            print(f"open nodes: {planet.edges_open_node}")
             print(f"target: {planet.target}")
             # if target set
             if planet.target is not None:
@@ -179,16 +184,14 @@ def run():
 
                 # no open edges at current node
                 else:
-                    print(f"open nodes LIST: {planet.open_nodes}")
-                    print(f"open nodes: {planet.edges_open_node}")
 
                     # closest nodes with open edges left
                     if planet.open_nodes != []:
                         # print(f"planet map: {planet.map}")
                         path_to_node = planet.closest_open_node((robot.x_coord, robot.y_coord))
-                        print(f"path to node: {path_to_node}")
 
                         if path_to_node is not None:
+                            print(f"closest node: {path_to_node[-1]}")
                             direction = path_to_node[0][1]
                         else:  # unveiled nodes that cant be reached -> terminate exploration
                             planet.task_done = True
@@ -197,10 +200,10 @@ def run():
                         planet.task_done = True
                         planet.type_task_done = "exploration completed"
 
-            print(f"task done: {planet.task_done}")
             # terminate if task done
             if planet.task_done:
-                print(f"type task done: {planet.type_task_done}")
+                print(f"planet task done: {planet.task_done}")
+                print(f"planet type task done: {planet.type_task_done}")
                 if planet.type_task_done == "target reached":
                     communication.targetReached_message()
                 elif planet.type_task_done == "exploration completed":

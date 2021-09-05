@@ -27,14 +27,14 @@ class Communication:
         """
         # DO NOT CHANGE THE SETUP HERE
         self.client = mqtt_client
-        #self.client.tls_set(tls_version=ssl.PROTOCOL_TLS)  # couln't fix SSL problem on mac, so only that way it works
+        self.client.tls_set(tls_version=ssl.PROTOCOL_TLS)  # couln't fix SSL problem on mac, so only that way it works
         self.client.on_message = self.safe_on_message_handler
 
         self.logger = logger
 
         # Client setup here
         self.client.username_pw_set('131', password='cxdOXaj4Q5')  # password from python test site
-        self.client.connect("mothership.inf.tu-dresden.de", port=1883)  # connection to mothership
+        self.client.connect("mothership.inf.tu-dresden.de", port=8883)  # connection to mothership
         self.client.subscribe('explorer/131', qos=1)  # topic subscription
         self.client.loop_start()
 

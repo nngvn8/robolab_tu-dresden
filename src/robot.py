@@ -153,18 +153,18 @@ class Robot:
         (red, green, blue) = self.color_sensor.raw
         if red in range(90, 170) and green in range(0, 100) and blue in range(0, 75):
             self.node_found = "red"
-            print(f"color_node: {self.node_found}")
-            print(f"red: {red}")
-            print(f"green: {green}")
-            print(f"blue: {blue}")
+            # print(f"color_node: {self.node_found}")
+            # print(f"red: {red}")
+            # print(f"green: {green}")
+            # print(f"blue: {blue}")
             return True
 
         if red in range(0, 40) and green in range(50, 150) and blue in range(60, 120):
             self.node_found = "blue"
-            print(f"color_node: {self.node_found}")
-            print(f"red: {red}")
-            print(f"green: {green}")
-            print(f"blue: {blue}")
+            # print(f"color_node: {self.node_found}")
+            # print(f"red: {red}")
+            # print(f"green: {green}")
+            # print(f"blue: {blue}")
             return True
 
         self.node_found = ""
@@ -246,6 +246,8 @@ class Robot:
             edges_return.append(0)
         if 270 in edges:
             edges_return.append(270)
+
+        print(f"scanned edges: {edges_return}")
 
         # transfrom to coordinates
         for i in range(len(edges_return)):
