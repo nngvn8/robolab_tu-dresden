@@ -42,18 +42,23 @@ def run():
     planet = Planet()
     communication = Communication(client, logger, planet)
 
-    # GO TO FIRST NODE
+   # GO TO FIRST NODE
     while True:
         robot.follow_line()
         if robot.found_node():
+            print("########################FIRST NODE################################")
             robot.stop()
             robot.enter_node()
             robot.stop()
 
             # initialize communication and odometry
-            communication.testplanet_message("Boseman")  # ################### to be removed!!!
+            communication.testplanet_message("Leinad")  # ################### to be removed!!!
             communication.ready_message()
             robot.odometry.init(communication.startX, communication.startY, communication.startOrientation, robot)
+
+            print(f"start_x: {robot.x_coord}")
+            print(f"start_y: {robot.y_coord}")
+            print(f"star_dir: {robot.direction}")
 
             # add first node to map if not already in it with path unveil
             if not (robot.x_coord, robot.y_coord) in planet.map:
@@ -83,9 +88,14 @@ def run():
             path_to_target = None
             direction = None  # ### ??
 
+            print(f"open nodes LIST: {planet.open_nodes}")
+            print(f"open nodes: {planet.edges_open_node}")
+            print(f"target: {planet.target}")
+
             # if target set
             if planet.target is not None:
                 path_to_target = planet.shortest_path((robot.x_coord, robot.y_coord), planet.target)
+                print(f"path_to_target: {path_to_target}")
 
                 # if reachable
                 if path_to_target is not None:
@@ -94,6 +104,7 @@ def run():
             # Exploration if no target or target not reachable
             if planet.target is None or path_to_target is None:
                 open_edges = planet.get_open_edges((robot.x_coord, robot.y_coord))
+                print(f"local open edges: {open_edges}")
 
                 # open edges at current node
                 if open_edges != []:
@@ -104,6 +115,8 @@ def run():
                     # unveiled nodes left
                     if planet.open_nodes != []:
                         path_to_node = planet.closest_open_node((robot.x_coord, robot.y_coord))
+                        print(f"path to closest open node: {path_to_node}")
+                        print(f"closest node: {path_to_node[-1]}")
                         direction = path_to_node[0][1]
 
             # submit chosen path, wait and exit communication
@@ -111,6 +124,7 @@ def run():
             communication.wait()
             robot.play_sound()
 
+            print(f"communication order: {communication.startDirectionC}")
             if communication.startDirectionC is not None:
                 direction = communication.startDirectionC
             robot.turn_to_direction(direction)

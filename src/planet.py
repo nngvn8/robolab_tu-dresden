@@ -81,49 +81,15 @@ class Planet:
                 del self.edges_open_node[target2]
                 self.open_nodes.remove(target2)
 
-
-
-        # if start2 in self.map:
-        #     if start_direction not in self.map[start2]: #not sure if it checks whats in the Tuple -> checks for (x,y) not for the y in itself
-        #         paths = self.map[start2] #gets to already mapped paths so they dont get overwritten
-        #         paths[start_direction] = (target2,target_direction,weight)
-        #         self.map[start2] = paths #should work properly
-        #     #else would be pointless since on every node theres only one path in each direction
-        #
-        # else:
-        #     paths = {start_direction : (target2,target_direction,weight)}
-        #     self.map[start2] = paths #should work properly
-        
-                
-        #basically the same as above, just reversed bc it is supposed to add a bidirectional path
-
-        # if target2 in self.map:
-        #     if target_direction not in self.map[target2]:
-        #         paths = self.map[target2]
-        #         paths[target_direction] = (start2,start_direction,weight)
-        #         self.map[target2] = paths
-        # else:
-        #     paths = {target_direction : (start2,start_direction,weight)}
-        #     self.map[target2] = paths
-
         if start2 not in self.map:
             self.map[start2] = {}
 
         if target2 not in self.map:
             self.map[target2] = {}
 
-        # if start_direction not in self.map[start2]:
-        #     self.map[target2][start_direction] = {}
-        #
-        # if target_direction not in self.map[target2]:
-        #     self.map[target2][target_direction] = {}
-
         self.map[start2][start_direction] = (target2, target_direction, weight)
         self.map[target2][target_direction] = (start2, start_direction, weight)
         
- 
-
-
     def get_paths(self) -> Dict[Tuple[int, int], Dict[Direction, Tuple[Tuple[int, int], Direction, Weight]]]:
         """
         Returns all paths

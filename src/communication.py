@@ -27,7 +27,7 @@ class Communication:
         """
         # DO NOT CHANGE THE SETUP HERE
         self.client = mqtt_client
-        self.client.tls_set(tls_version=ssl.PROTOCOL_TLS)  # couln't fix SSL problem on mac, so only that way it works
+        self.client.tls_set(tls_version=ssl.PROTOCOL_TLS)
         self.client.on_message = self.safe_on_message_handler
 
         self.logger = logger
@@ -271,16 +271,6 @@ class Communication:
         }
         topic = "explorer/131"
         self.send_message(topic, json.dumps(message))
-
-    """
-    def syntaxTester_message(self):
-        message = {
-            "from": "client",
-            "type": "ready"
-        }
-        topic = "comtest/131"
-        self.send_message(topic, json.dumps(message))
-    """
 
     # DO NOT EDIT THE METHOD SIGNATURE OR BODY
     #
