@@ -45,8 +45,6 @@ class Robot:
 
         self.last_node = ((0, 0), 0)
 
-        self.TIME360_AT100 = 5.7
-
     def forward(self, speed=None):
         if speed is None:
             speed = self.default_speed
@@ -159,7 +157,7 @@ class Robot:
             # print(f"blue: {blue}")
             return True
 
-        if red in range(0, 40) and green in range(50, 170) and blue in range(55, 120):
+        if red in range(0, 40) and green in range(50, 175) and blue in range(55, 120):
             self.node_found = "blue"
             # print(f"color_node: {self.node_found}")
             # print(f"red: {red}")
@@ -195,11 +193,6 @@ class Robot:
         edges = []
         turn = self.TICKS360 * 0.95
         breakout = False
-
-        # self.left_motor.run_to_rel_pos(position_sp=-15, speed_sp=100)
-        # self.right_motor.run_to_rel_pos(position_sp=15, speed_sp=100)
-        # self.left_motor.wait_until_not_moving()
-        # self.right_motor.wait_until_not_moving()
 
         # reset to use motor.position
         self.left_motor.reset()
