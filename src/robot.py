@@ -8,7 +8,7 @@ from pid_controller import PIDController
 class Robot:
 
     TICKS360 = 620
-    LUM_STOP_LINE = 300
+    LUM_STOP_LINE = 270  # 300 before
 
     def __init__(self, movement_speed=170, rotation_speed=100):
 
@@ -85,12 +85,13 @@ class Robot:
             else:
                 self.turn_w_ticks(turn_deg, -60)
 
+            self.direction = (self.direction + turn_deg) % 360
+
         # find line
         while self.calc_luminance() > self.LUM_STOP_LINE:
             self.left_motor.run_forever(speed_sp=self.rotation_speed)
             self.right_motor.run_forever(speed_sp=-self.rotation_speed)
 
-        self.direction = (self.direction + turn_deg) % 360
 
     def turn_around(self):
         self.direction = (self.direction + 180) % 360
@@ -248,8 +249,8 @@ class Robot:
             self.right_motor.wait_until_not_moving()
 
         # make sure line before us is scanned in case we didnt drive on the node properly
-        if self.calc_luminance() < self.LUM_STOP_LINE:
-            edges.append(self.direction)
+        if self.calc_luminance() < self.LUM_STOP_LINE + 30:
+            edges.append(0)
 
         # order from right to left
         edges_return = []

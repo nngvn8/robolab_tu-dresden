@@ -52,7 +52,7 @@ def run():
             robot.stop()
 
             # initialize communication and odometry
-            communication.testplanet_message("Boseman")  # ################### to be removed!!!
+            communication.testplanet_message("Reis")  # ################### to be removed!!!
             communication.ready_message()
             robot.odometry.init(communication.startX, communication.startY, communication.startOrientation, robot)
 
@@ -265,9 +265,15 @@ def run():
 
             print(f"communication order: {communication.startDirectionC}")
             # update direction, turn and update
-            if communication.startDirectionC is not None \
-                    and (robot.x_coord, robot.y_coord, communication.startDirectionC) not in planet.meteor_nodes:
-                direction = communication.startDirectionC
+            if communication.startDirectionC is not None:
+                if (robot.x_coord, robot.y_coord, communication.startDirectionC) not in planet.meteor_nodes:
+                    direction = communication.startDirectionC
+                else:
+                    blocked = True
+                    cur_node = ((robot.x_coord, robot.y_coord), communication.startDirectionC)
+                    communication.path_message(cur_node, cur_node, blocked)
+                    communication.pathSelect_message(robot.x_coord, robot.y_coord, direction)
+
             robot.turn_to_direction(direction)
             robot.last_node = ((robot.x_coord, robot.y_coord), robot.direction)
 

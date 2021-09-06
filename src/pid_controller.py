@@ -10,7 +10,7 @@ class PIDController:
         self.kd = 20  # 42.76
         self.integral = 0
         self.last_error = 0
-        self.offset = 170  # determined by experiment on line
+        self.offset = 180  # determined by experiment on line
 
     def adjust_motors(self, luminance, robot):
         # calculating needed parameters
@@ -21,11 +21,17 @@ class PIDController:
         else:
             self.integral = self.integral * 90 / 100 + error
 
+        if self.integral > 600 or self.integral < - 1000:
+            slow = (abs(self.integral) ** 2) / 17000
+            print(slow)
+        else:
+            slow = 0
+
         # actual calculation and application of the adjustment
         # caution! for this application sensor has to be on the left side of the line!
         turn = error * self.kp + self.integral * self.ki + derivative * self.kd
-        robot.left_motor.speed_sp = self.cap_speed(robot.default_speed + turn / 100)
-        robot.right_motor.speed_sp = self.cap_speed(robot.default_speed - turn / 100)
+        robot.left_motor.speed_sp = self.cap_speed(robot.default_speed + turn / 100 - slow)
+        robot.right_motor.speed_sp = self.cap_speed(robot.default_speed - turn / 100 - slow)
 
         # committing the new motor speeds
         robot.left_motor.command = "run-forever"

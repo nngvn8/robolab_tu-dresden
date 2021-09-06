@@ -69,9 +69,9 @@ class Odometry:
 
         x = robot.x_coord + dist_trav_x / 500
         y = robot.y_coord + dist_trav_y / 500
-        x = round(x)
-        y = round(y)
-        # x, y = self.closest_possible_xy(x, y, robot.node_found)
+        # x = round(x)
+        # y = round(y)
+        x, y = self.closest_possible_xy(x, y, robot.node_found)
 
         print(f"direction (rounded): {direction}")
         print(f"x: {x}")
@@ -84,7 +84,6 @@ class Odometry:
         cur_node = ((x, y), (direction + 180) % 360)
 
         return cur_node
-
 
     def closest_possible_xy(self, x, y, found_color):
         x_floor = floor(x)
