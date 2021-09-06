@@ -122,13 +122,10 @@ class TestRoboLabPlanet(unittest.TestCase):
         Result: Target is not reachable
         new planet:
 
-        0,1--1,1  2,1
-         |    |    |
-        0,0--1,0  2,0
 
         """
 
-        self.assertIsNone(self.planet.shortest_path((0, 0), (3, 3)))
+        self.assertIsNone(self.planet.shortest_path((0, 3), (3, 3)))
 
 
 
