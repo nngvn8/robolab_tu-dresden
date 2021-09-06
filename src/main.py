@@ -55,6 +55,10 @@ def run():
             communication.ready_message()
             robot.odometry.init(communication.startX, communication.startY, communication.startOrientation, robot)
 
+            # add first node to map if not already in it with path unveil
+            if not (robot.x_coord, robot.y_coord) in planet.map:
+                planet.map[(robot.x_coord, robot.y_coord)] = {}
+
             open_edges = robot.scan_for_edges()
 
             # add open edges/node if not already known
