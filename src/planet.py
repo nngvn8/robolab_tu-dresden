@@ -59,37 +59,40 @@ class Planet:
         :return: void
         """
 
-        start2, start_direction = start     #get directions from start
-        start_x, start_y = start2           #get coordinates from start
-        target2, target_direction = target  #get directions from target
-        target_x, target_y = target2        #get coordinates from target
+        start_coordinates, start_direction = start     # get directions and coordinates from start
+        target_coordinates, target_direction = target  # get directions and coordinates from target
 
-        # {(x,y):[SOUTH,NORTH]}
+        # remove open edges and if necessary the open node
+        if start_coordinates in self.open_nodes:
+            if start_direction in self.edges_open_node[start_coordinates]:
+                self.edges_open_node[start_coordinates].remove(start_direction)
+            if len(self.edges_open_node[start_coordinates]) <= 0:
+                del self.edges_open_node[start_coordinates]
+                self.open_nodes.remove(start_coordinates)
 
-        if start2 in self.open_nodes:
-            if start_direction in self.edges_open_node[start2]:
-                self.edges_open_node[start2].remove(start_direction)
-            if len(self.edges_open_node[start2]) <= 0:
-                del self.edges_open_node[start2]
-                self.open_nodes.remove(start2)
+        if target_coordinates in self.open_nodes:
+            if target_direction in self.edges_open_node[target_coordinates]:
+                self.edges_open_node[target_coordinates].remove(target_direction)
 
-        if target2 in self.open_nodes:
-            if target_direction in self.edges_open_node[target2]:
-                self.edges_open_node[target2].remove(target_direction)
+            if len(self.edges_open_node[target_coordinates]) <= 0:
+                del self.edges_open_node[target_coordinates]
+                self.open_nodes.remove(target_coordinates)
 
-            if len(self.edges_open_node[target2]) <= 0:
-                del self.edges_open_node[target2]
-                self.open_nodes.remove(target2)
+        if start_coordinates not in self.map:
+            self.map[start_coordinates] = {}
 
-        if start2 not in self.map:
-            self.map[start2] = {}
+        if target_coordinates not in self.map:
+            self.map[target_coordinates] = {}
 
-        if target2 not in self.map:
-            self.map[target2] = {}
+        self.map[start_coordinates][start_direction] = (target_coordinates, target_direction, weight)
+        self.map[target_coordinates][target_direction] = (start_coordinates, start_direction, weight)
 
-        self.map[start2][start_direction] = (target2, target_direction, weight)
-        self.map[target2][target_direction] = (start2, start_direction, weight)
-        
+        if len(self.map[start_coordinates].keys()) == 4 and start_coordinates not in self.scanned_nodes:
+            self.scanned_nodes.append(start_coordinates)
+
+        if len(self.map[target_coordinates].keys()) == 4 and target_coordinates not in self.scanned_nodes:
+            self.scanned_nodes.append(target_coordinates)
+
     def get_paths(self) -> Dict[Tuple[int, int], Dict[Direction, Tuple[Tuple[int, int], Direction, Weight]]]:
         """
         Returns all paths

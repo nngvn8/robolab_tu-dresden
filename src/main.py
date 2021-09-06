@@ -52,7 +52,7 @@ def run():
             robot.stop()
 
             # initialize communication and odometry
-            communication.testplanet_message("Leinad")  # ################### to be removed!!!
+            communication.testplanet_message("Boseman")  # ################### to be removed!!!
             communication.ready_message()
             robot.odometry.init(communication.startX, communication.startY, communication.startOrientation, robot)
 
@@ -64,12 +64,14 @@ def run():
             if not (robot.x_coord, robot.y_coord) in planet.map:
                 planet.map[(robot.x_coord, robot.y_coord)] = {}
 
-            open_edges = robot.scan_for_edges()
+            # only scan if we dont know all surrounding edges
+            if len(planet.map[(robot.x_coord, robot.y_coord)]) < 3:
+                open_edges = robot.scan_for_edges()
 
-            # add open edges/node if not already known
-            for edge in open_edges:
-                if edge not in planet.map[(robot.x_coord, robot.y_coord)].keys():
-                    planet.add_open_node((robot.x_coord, robot.y_coord), edge)
+                # add open edges/node if not already known
+                for edge in open_edges:
+                    if edge not in planet.map[(robot.x_coord, robot.y_coord)].keys():
+                        planet.add_open_node((robot.x_coord, robot.y_coord), edge)
 
             # mark as scanned
             planet.scanned_nodes.append((robot.x_coord, robot.y_coord))

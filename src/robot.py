@@ -69,22 +69,23 @@ class Robot:
         self.right_motor.run_forever(speed_sp=-speed)
 
     def turn_to_direction(self, direction):
-        if self.direction == direction:
-            return
 
-        turn_deg = (direction - self.direction) % 360
+        # turn to direction if different from our direction
+        if not self.direction == direction:
 
-        # turn left if shorter
-        if turn_deg == 270:
-            turn_deg = -90
+            turn_deg = (direction - self.direction) % 360
 
-        # make turn with offset
-        if turn_deg == -90:
-            self.turn_w_ticks(turn_deg, -20)
-        else:
-            self.turn_w_ticks(turn_deg, -60)
+            # turn left if shorter
+            if turn_deg == 270:
+                turn_deg = -90
 
-        # find line (just use follow line?)
+            # make turn with offset
+            if turn_deg == -90:
+                self.turn_w_ticks(turn_deg, -20)
+            else:
+                self.turn_w_ticks(turn_deg, -60)
+
+        # find line
         while self.calc_luminance() > self.LUM_STOP_LINE:
             self.left_motor.run_forever(speed_sp=self.rotation_speed)
             self.right_motor.run_forever(speed_sp=-self.rotation_speed)
@@ -93,7 +94,7 @@ class Robot:
 
     def turn_around(self):
         self.direction = (self.direction + 180) % 360
-        self.turn_w_ticks(180, -30)
+        self.turn_w_ticks(180, -70)
         while self.calc_luminance() > self.LUM_STOP_LINE:
             self.left_motor.run_forever(speed_sp=self.rotation_speed)
             self.right_motor.run_forever(speed_sp=-self.rotation_speed)
@@ -181,17 +182,13 @@ class Robot:
         self.pid_controller.last_error = 0
 
         # position on the exact middle of node
-        if self.node_found == "red":
-            self.left_motor.run_to_rel_pos(position_sp=135, speed_sp=100)
-            self.right_motor.run_to_rel_pos(position_sp=135, speed_sp=100)
-            self.left_motor.wait_until_not_moving()
-            self.right_motor.wait_until_not_moving()
-        elif self.node_found == "blue":
-            self.left_motor.run_to_rel_pos(position_sp=135, speed_sp=100)
-            self.right_motor.run_to_rel_pos(position_sp=135, speed_sp=100)
-            self.left_motor.wait_until_not_moving()
-            self.right_motor.wait_until_not_moving()
+        self.left_motor.run_to_rel_pos(position_sp=135, speed_sp=100)
+        self.right_motor.run_to_rel_pos(position_sp=135, speed_sp=100)
+        self.left_motor.wait_until_not_moving()
+        self.right_motor.wait_until_not_moving()
         self.stop()
+
+        self.odometry.add_motor_pos(self)
 
     def scan_for_edges(self):
         edges = []
@@ -249,6 +246,10 @@ class Robot:
             self.left_motor.run_to_rel_pos(position_sp=40, speed_sp=self.rotation_speed)
             self.right_motor.run_to_rel_pos(position_sp=-40, speed_sp=-self.rotation_speed)
             self.right_motor.wait_until_not_moving()
+
+        # make sure line before us is scanned in case we didnt drive on the node properly
+        if self.calc_luminance() < self.LUM_STOP_LINE:
+            edges.append(self.direction)
 
         # order from right to left
         edges_return = []
