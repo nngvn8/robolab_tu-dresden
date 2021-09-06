@@ -5,7 +5,7 @@ class PIDController:
 
     def __init__(self):
         # k parameters times 100
-        self.kp = 50  # kc = 60
+        self.kp = 42  # kc = 60
         self.ki = 4
         self.kd = 20  # 42.76
         self.integral = 0
@@ -19,7 +19,7 @@ class PIDController:
         if error > 0 > self.last_error or error < 0 < self.last_error:
             self.integral = error  # = 0 ?
         else:
-            self.integral = self.integral / 3 + error
+            self.integral = self.integral * 90 / 100 + error
 
         # actual calculation and application of the adjustment
         # caution! for this application sensor has to be on the left side of the line!

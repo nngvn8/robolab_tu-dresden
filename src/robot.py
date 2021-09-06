@@ -8,7 +8,7 @@ from pid_controller import PIDController
 class Robot:
 
     TICKS360 = 620
-    LUM_STOP_LINE = 200
+    LUM_STOP_LINE = 300
 
     def __init__(self, movement_speed=170, rotation_speed=100):
 
@@ -43,8 +43,7 @@ class Robot:
         self.x_coord = 0
         self.y_coord = 0
 
-        self.last_node = (0, 0, 0)
-        self.current_node = (0, 0, 0)
+        self.last_node = ((0, 0), 0)
 
         self.TIME360_AT100 = 5.7
 
@@ -91,7 +90,6 @@ class Robot:
             self.right_motor.run_forever(speed_sp=-self.rotation_speed)
 
         self.direction = (self.direction + turn_deg) % 360
-        self.last_node = (self.x_coord, self.y_coord, self.direction)
 
     def turn_around(self):
         self.direction = (self.direction + 180) % 360
@@ -159,7 +157,7 @@ class Robot:
             # print(f"blue: {blue}")
             return True
 
-        if red in range(0, 40) and green in range(50, 150) and blue in range(60, 120):
+        if red in range(0, 40) and green in range(50, 170) and blue in range(55, 120):
             self.node_found = "blue"
             # print(f"color_node: {self.node_found}")
             # print(f"red: {red}")
@@ -179,6 +177,9 @@ class Robot:
         # ev3.Sound.speak('Obstacle found!')
 
     def enter_node(self):
+        self.pid_controller.integral = 0
+        self.pid_controller.last_error = 0
+
         # position on the exact middle of node
         if self.node_found == "red":
             self.left_motor.run_to_rel_pos(position_sp=135, speed_sp=100)
@@ -197,6 +198,11 @@ class Robot:
         turn = self.TICKS360 * 0.95
         breakout = False
 
+        # self.left_motor.run_to_rel_pos(position_sp=-15, speed_sp=100)
+        # self.right_motor.run_to_rel_pos(position_sp=15, speed_sp=100)
+        # self.left_motor.wait_until_not_moving()
+        # self.right_motor.wait_until_not_moving()
+
         # reset to use motor.position
         self.left_motor.reset()
         self.right_motor.reset()
@@ -206,7 +212,7 @@ class Robot:
             # print(f"Motor Position: {self.left_motor.position}")
 
             # rotate while no line
-            while self.calc_luminance() > 55:
+            while self.calc_luminance() > 70:
                 # rotate
                 self.left_motor.run_forever(speed_sp=self.rotation_speed)
                 self.right_motor.run_forever(speed_sp=-self.rotation_speed)
@@ -226,8 +232,14 @@ class Robot:
             # remove stutter? -> other implementation needed
 
             # calc direction of edge
-            # print(self.left_motor.position * 1.3 / 2)
-            current_rotation = round(self.left_motor.position * 1.3 / 2 / 90) * 90
+            current_rotation = self.left_motor.position * 1.3 / 2
+            print(current_rotation)
+
+            if current_rotation > 270:
+                current_rotation = 270
+
+            current_rotation = round(current_rotation / 90) * 90
+
 
             # add edge, but only if its not 180 (because we already know it)
             if current_rotation != 180:

@@ -171,13 +171,15 @@ class Communication:
 
     # send path which robot took to next communication point
     def path_message(self, starting_node, end_node, blocked=False):
-        Xs = starting_node[0]
-        Ys = starting_node[1]
-        Ds = starting_node[2]
+        # unpack start from tuple representation ((x,y), dir)
+        Xs = starting_node[0][0]
+        Ys = starting_node[0][1]
+        Ds = starting_node[1]
 
-        Xe = end_node[0]
-        Ye = end_node[1]
-        De = end_node[2]
+        # unpack end from tuple representation ((x,y), dir)
+        Xe = end_node[0][0]
+        Ye = end_node[0][1]
+        De = end_node[1]
 
         # distinction between blocked and free path
         # if start and end point are the same path is blocked, if not path is free

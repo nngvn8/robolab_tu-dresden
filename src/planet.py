@@ -97,14 +97,14 @@ class Planet:
                 
         #basically the same as above, just reversed bc it is supposed to add a bidirectional path
 
-        if target2 in self.map:
-            if target_direction not in self.map[target2]:
-                paths = self.map[target2]
-                paths[target_direction] = (start2,start_direction,weight)
-                self.map[target2] = paths
-        else:
-            paths = {target_direction : (start2,start_direction,weight)}
-            self.map[target2] = paths
+        # if target2 in self.map:
+        #     if target_direction not in self.map[target2]:
+        #         paths = self.map[target2]
+        #         paths[target_direction] = (start2,start_direction,weight)
+        #         self.map[target2] = paths
+        # else:
+        #     paths = {target_direction : (start2,start_direction,weight)}
+        #     self.map[target2] = paths
 
         if start2 not in self.map:
             self.map[start2] = {}
@@ -178,11 +178,11 @@ class Planet:
                     # updates closest_unvisited_node
                     closest_unvisited_node = node
             # print(f"distance to {closest_unvisited_node}: {distance[closest_unvisited_node]}")
-            if closest_unvisited_node == target:
-                break
-            # if the closest_unvisited_node is not reachable, the algorithm stops and returns None
             if distance[closest_unvisited_node] == inf:
                 return None
+            # if the closest_unvisited_node is not reachable, the algorithm stops and returns None
+            if closest_unvisited_node == target:
+                break
             # removes the closest_unvisited_node from unvisited_nodes because now it has been visited
             unvisited_nodes.remove(closest_unvisited_node)
             # temporary list of neighbours of the closest_unvisited_node
@@ -224,6 +224,8 @@ class Planet:
             cur_node = predecessor[cur_node]
             path.insert(0, cur_node)
 
+        print(f"path to open node: {path}")
+
         ###- add directions to the already assembled shortest_path -###
 
         # empty list to fill with the shortest path + direction Tuples
@@ -247,6 +249,7 @@ class Planet:
             iterator += 1
         # deletes the last element since its the target node
         path_with_directions.pop()
+
         # returns the shortest path
         return path_with_directions
 
@@ -264,9 +267,10 @@ class Planet:
     def add_open_node(self, node, direction):
 
         # dont add node if already in map
-        if node in self.scanned_nodes or node in self.map and (self.map[node].keys()) == 4:
+        if node in self.scanned_nodes or node in self.map and len(self.map[node].keys()) == 4:
             return
 
+        # node is unveiled node -> added to open nodes but with out any open edges
         if node in self.map and direction in self.map[node]:
             if node not in self.open_nodes:
                 self.open_nodes.append(node)
@@ -279,7 +283,7 @@ class Planet:
             self.edges_open_node[node].append(direction)
 
     def closest_open_node(self, start):
-        currentdistance = inf
+        current_distance = inf
         shortest_path = None
         for node in self.open_nodes:
             path = self.shortest_path(start, node)
@@ -292,8 +296,8 @@ class Planet:
                 cur_weight += self.map[path_node[0]][path_node[1]][2]
 
             # update node if shorter path
-            if currentdistance > cur_weight:
-                currentdistance = cur_weight
+            if current_distance > cur_weight:
+                current_distance = cur_weight
                 shortest_path = path
         return shortest_path
 

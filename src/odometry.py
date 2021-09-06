@@ -77,12 +77,14 @@ class Odometry:
         print(f"x: {x}")
         print(f"y: {y}")
 
-        robot.x_coord = x
-        robot.y_coord = y
-        robot.direction = direction
-        robot.current_node = (x, y, (direction + 180) % 360)
+        # robot.x_coord = x
+        # robot.y_coord = y
+        # robot.direction = direction
 
-        self.motor_positions = []
+        cur_node = ((x, y), (direction + 180) % 360)
+
+        return cur_node
+
 
     def closest_possible_xy(self, x, y, found_color):
         x_floor = floor(x)
